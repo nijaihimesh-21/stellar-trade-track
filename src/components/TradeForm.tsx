@@ -108,11 +108,15 @@ const TradeForm: React.FC<TradeFormProps> = ({ onClose, onSuccess }) => {
 
   return (
     <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-card border border-border rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto animate-fade-in">
-        <div className="sticky top-0 bg-card border-b border-border p-6 flex items-center justify-between">
-          <h2 className="text-2xl font-semibold text-foreground">Add Trade</h2>
-          <button onClick={onClose} className="p-2 hover:bg-secondary rounded-lg transition-colors">
-            <X className="w-5 h-5 text-muted-foreground" />
+      <div className="bg-card border border-border rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto animate-fade-in shadow-2xl shadow-primary/5">
+        {/* Header with green accent */}
+        <div className="sticky top-0 bg-card border-b border-primary/20 p-6 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-1 h-8 bg-primary rounded-full" />
+            <h2 className="text-2xl font-semibold text-foreground">Add Trade</h2>
+          </div>
+          <button onClick={onClose} className="p-2 hover:bg-secondary rounded-lg transition-colors group">
+            <X className="w-5 h-5 text-muted-foreground group-hover:text-foreground transition-colors" />
           </button>
         </div>
 
@@ -121,23 +125,27 @@ const TradeForm: React.FC<TradeFormProps> = ({ onClose, onSuccess }) => {
             {/* Left Column */}
             <div className="space-y-5">
               <div className="space-y-2">
-                <Label className="text-foreground">Pair *</Label>
+                <Label className="text-foreground flex items-center gap-1">
+                  Pair <span className="text-primary">*</span>
+                </Label>
                 <Input
                   placeholder="eg-XAU/USD"
                   value={form.pair}
                   onChange={(e) => setForm({ ...form, pair: e.target.value })}
-                  className="bg-secondary border-border"
+                  className="bg-secondary border-border focus:border-primary/50 focus:ring-primary/20"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label className="text-foreground">Time *</Label>
+                  <Label className="text-foreground flex items-center gap-1">
+                    Time <span className="text-primary">*</span>
+                  </Label>
                   <Input
                     type="time"
                     value={form.trade_time}
                     onChange={(e) => setForm({ ...form, trade_time: e.target.value })}
-                    className="bg-secondary border-border"
+                    className="bg-secondary border-border focus:border-primary/50 focus:ring-primary/20"
                   />
                 </div>
                 <div className="space-y-2">
@@ -146,7 +154,7 @@ const TradeForm: React.FC<TradeFormProps> = ({ onClose, onSuccess }) => {
                     type="date"
                     value={form.trade_date}
                     onChange={(e) => setForm({ ...form, trade_date: e.target.value })}
-                    className="bg-secondary border-border"
+                    className="bg-secondary border-border focus:border-primary/50 focus:ring-primary/20"
                   />
                 </div>
               </div>
@@ -158,18 +166,20 @@ const TradeForm: React.FC<TradeFormProps> = ({ onClose, onSuccess }) => {
                     placeholder="TJL1"
                     value={form.strategy}
                     onChange={(e) => setForm({ ...form, strategy: e.target.value })}
-                    className="bg-secondary border-border"
+                    className="bg-secondary border-border focus:border-primary/50 focus:ring-primary/20"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-foreground">Entry Price *</Label>
+                  <Label className="text-foreground flex items-center gap-1">
+                    Entry Price <span className="text-primary">*</span>
+                  </Label>
                   <Input
                     type="number"
                     step="any"
                     placeholder="0.00"
                     value={form.entry_price}
                     onChange={(e) => setForm({ ...form, entry_price: e.target.value })}
-                    className="bg-secondary border-border"
+                    className="bg-secondary border-border focus:border-primary/50 focus:ring-primary/20"
                   />
                 </div>
               </div>
@@ -183,7 +193,7 @@ const TradeForm: React.FC<TradeFormProps> = ({ onClose, onSuccess }) => {
                     placeholder="0.00"
                     value={form.stop_loss}
                     onChange={(e) => setForm({ ...form, stop_loss: e.target.value })}
-                    className="bg-secondary border-border"
+                    className="bg-secondary border-border focus:border-primary/50 focus:ring-primary/20"
                   />
                 </div>
                 <div className="space-y-2">
@@ -194,7 +204,7 @@ const TradeForm: React.FC<TradeFormProps> = ({ onClose, onSuccess }) => {
                     placeholder="0.00"
                     value={form.take_profit}
                     onChange={(e) => setForm({ ...form, take_profit: e.target.value })}
-                    className="bg-secondary border-border"
+                    className="bg-secondary border-border focus:border-primary/50 focus:ring-primary/20"
                   />
                 </div>
               </div>
@@ -208,7 +218,7 @@ const TradeForm: React.FC<TradeFormProps> = ({ onClose, onSuccess }) => {
                     placeholder="0.00"
                     value={form.exit_price}
                     onChange={(e) => setForm({ ...form, exit_price: e.target.value })}
-                    className="bg-secondary border-border"
+                    className="bg-secondary border-border focus:border-primary/50 focus:ring-primary/20"
                   />
                 </div>
                 <div className="space-y-2">
@@ -219,7 +229,7 @@ const TradeForm: React.FC<TradeFormProps> = ({ onClose, onSuccess }) => {
                     placeholder="1.0"
                     value={form.position_size}
                     onChange={(e) => setForm({ ...form, position_size: e.target.value })}
-                    className="bg-secondary border-border"
+                    className="bg-secondary border-border focus:border-primary/50 focus:ring-primary/20"
                   />
                 </div>
               </div>
@@ -232,7 +242,7 @@ const TradeForm: React.FC<TradeFormProps> = ({ onClose, onSuccess }) => {
                   placeholder="e.g. 150 or -50"
                   value={form.outcome}
                   onChange={(e) => setForm({ ...form, outcome: e.target.value })}
-                  className="bg-secondary border-border"
+                  className="bg-secondary border-border focus:border-primary/50 focus:ring-primary/20"
                 />
               </div>
 
@@ -245,8 +255,8 @@ const TradeForm: React.FC<TradeFormProps> = ({ onClose, onSuccess }) => {
                     className={cn(
                       "px-6 py-2 rounded-lg font-medium transition-all",
                       form.position_type === "buy"
-                        ? "bg-foreground text-background"
-                        : "bg-secondary text-muted-foreground hover:text-foreground"
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-secondary text-muted-foreground hover:text-foreground hover:border-primary/30 border border-transparent"
                     )}
                   >
                     Buy
@@ -257,8 +267,8 @@ const TradeForm: React.FC<TradeFormProps> = ({ onClose, onSuccess }) => {
                     className={cn(
                       "px-6 py-2 rounded-lg font-medium transition-all",
                       form.position_type === "sell"
-                        ? "bg-foreground text-background"
-                        : "bg-secondary text-muted-foreground hover:text-foreground"
+                        ? "bg-destructive text-destructive-foreground"
+                        : "bg-secondary text-muted-foreground hover:text-foreground hover:border-destructive/30 border border-transparent"
                     )}
                   >
                     Sell
@@ -275,7 +285,7 @@ const TradeForm: React.FC<TradeFormProps> = ({ onClose, onSuccess }) => {
                   placeholder="Add a short description here..."
                   value={form.notes}
                   onChange={(e) => setForm({ ...form, notes: e.target.value })}
-                  className="bg-secondary border-border flex-1 min-h-[300px] resize-none"
+                  className="bg-secondary border-border flex-1 min-h-[300px] resize-none focus:border-primary/50 focus:ring-primary/20"
                 />
               </div>
             </div>
@@ -294,7 +304,7 @@ const TradeForm: React.FC<TradeFormProps> = ({ onClose, onSuccess }) => {
             <Button
               type="submit"
               disabled={loading}
-              className="bg-foreground text-background hover:bg-foreground/90 font-medium px-8"
+              className="bg-primary text-primary-foreground hover:bg-primary/90 font-medium px-8"
             >
               {loading ? "Adding..." : "Add Trade"}
             </Button>
