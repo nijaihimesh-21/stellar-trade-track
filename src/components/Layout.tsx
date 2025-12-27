@@ -76,7 +76,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 onClick={() => navigate(item.path)}
                 className={cn(
                   "sidebar-link w-full",
-                  isActive && "active"
+                  isActive && "active",
+                  collapsed && "justify-center"
                 )}
               >
                 <item.icon className="w-5 h-5 shrink-0" />
@@ -90,7 +91,10 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         <div className="p-3 border-t border-sidebar-border">
           <button
             onClick={handleSignOut}
-            className="sidebar-link w-full text-destructive hover:bg-destructive/10"
+            className={cn(
+              "sidebar-link w-full text-destructive hover:bg-destructive/10",
+              collapsed && "justify-center"
+            )}
           >
             <LogOut className="w-5 h-5 shrink-0" />
             {!collapsed && <span>Sign Out</span>}
