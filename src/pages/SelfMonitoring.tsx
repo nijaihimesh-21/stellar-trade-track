@@ -406,6 +406,8 @@ const SelfMonitoring = () => {
               const isFuture = isAfter(startOfDay(day), today);
               const isSelectedDate = isSameDay(day, selectedDate);
               const showPreview = isSelectedDate && hasUnsavedChanges();
+              const dayColor = isSelected && !isFuture ? getDayColor(day, true) : (!isSelected && !isFuture ? getDayColor(day, false) : "");
+              const isNeutral = dayColor === "bg-foreground";
               
               return (
                 <button
@@ -419,7 +421,8 @@ const SelfMonitoring = () => {
                     isSelected && !isFuture && getDayColor(day, true),
                     isFuture && "bg-secondary text-muted-foreground",
                     isToday && !isSelected && "ring-1 ring-muted-foreground",
-                    showPreview && "animate-pulse"
+                    showPreview && "animate-pulse",
+                    isNeutral && !isFuture && "text-background"
                   )}
                 >
                   {format(day, "d")}
