@@ -7,6 +7,11 @@ import { Plus, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import {
   format,
   startOfMonth,
   endOfMonth,
@@ -230,6 +235,29 @@ const SelfMonitoring = () => {
     return "bg-foreground";
   };
 
+  // Get tooltip text for a day based on habit completion
+  const getDayTooltip = (date: Date) => {
+    const dateStr = format(date, "yyyy-MM-dd");
+    const isFuture = isAfter(startOfDay(date), today);
+    
+    if (isFuture) return "Future date";
+    
+    const stats = calendarData[dateStr];
+    if (!stats || (stats.positive === 0 && stats.negative === 0)) {
+      return "No habits recorded";
+    }
+    
+    const total = stats.positive + stats.negative;
+    const totalHabits = habits.length;
+    
+    if (total >= totalHabits && totalHabits > 0) {
+      return "All habits recorded";
+    } else if (total > 0) {
+      return "Some habits recorded";
+    }
+    return "No habits recorded";
+  };
+
   // Check if there are unsaved changes
   const hasUnsavedChanges = () => {
     const savedSelections: Record<string, boolean> = {};
@@ -410,23 +438,30 @@ const SelfMonitoring = () => {
               const isNeutral = dayColor === "bg-foreground";
               
               return (
-                <button
-                  key={day.toISOString()}
-                  onClick={() => setSelectedDate(day)}
-                  className={cn(
-                    "aspect-square rounded-lg flex items-center justify-center text-sm font-medium transition-all",
-                    !isSameMonth(day, currentMonth) && "text-muted-foreground/50",
-                    isSelected && "ring-2 ring-foreground",
-                    !isSelected && !isFuture && getDayColor(day, false),
-                    isSelected && !isFuture && getDayColor(day, true),
-                    isFuture && "bg-secondary text-muted-foreground",
-                    isToday && !isSelected && "ring-1 ring-muted-foreground",
-                    showPreview && "animate-pulse",
-                    isNeutral && !isFuture && "text-background"
-                  )}
-                >
-                  {format(day, "d")}
-                </button>
+                <Tooltip key={day.toISOString()}>
+                  <TooltipTrigger asChild>
+                    <button
+                      onClick={() => setSelectedDate(day)}
+                      className={cn(
+                        "aspect-square rounded-lg flex items-center justify-center text-sm font-medium transition-all",
+                        !isSameMonth(day, currentMonth) && "text-muted-foreground/50",
+                        isSelected && "ring-2 ring-foreground",
+                        !isSelected && !isFuture && getDayColor(day, false),
+                        isSelected && !isFuture && getDayColor(day, true),
+                        isFuture && "bg-secondary text-muted-foreground",
+                        isToday && !isSelected && "ring-1 ring-muted-foreground",
+                        showPreview && "animate-pulse",
+                        isNeutral && !isFuture && "text-background"
+                      )}
+                    >
+                      {format(day, "d")}
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>{format(day, "MMM d, yyyy")}</p>
+                    <p className="text-xs text-muted-foreground">{getDayTooltip(day)}</p>
+                  </TooltipContent>
+                </Tooltip>
               );
             })}
           </div>

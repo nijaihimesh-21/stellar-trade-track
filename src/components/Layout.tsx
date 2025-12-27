@@ -11,6 +11,11 @@ import {
   X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -58,12 +63,19 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               ACCUMULATE
             </span>
           )}
-          <button
-            onClick={() => setCollapsed(!collapsed)}
-            className="p-2 rounded-lg hover:bg-sidebar-accent transition-colors text-sidebar-foreground"
-          >
-            {collapsed ? <Menu className="w-5 h-5" /> : <X className="w-5 h-5" />}
-          </button>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                onClick={() => setCollapsed(!collapsed)}
+                className="p-2 rounded-lg hover:bg-sidebar-accent transition-colors text-sidebar-foreground"
+              >
+                {collapsed ? <Menu className="w-5 h-5" /> : <X className="w-5 h-5" />}
+              </button>
+            </TooltipTrigger>
+            <TooltipContent side="right">
+              {collapsed ? "Open Menu" : "Close Menu"}
+            </TooltipContent>
+          </Tooltip>
         </div>
 
         {/* Navigation */}
@@ -71,34 +83,51 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           {navItems.map((item) => {
             const isActive = location.pathname === item.path;
             return (
-              <button
-                key={item.path}
-                onClick={() => navigate(item.path)}
-                className={cn(
-                  "sidebar-link w-full",
-                  isActive && "active",
-                  collapsed && "justify-center"
+              <Tooltip key={item.path}>
+                <TooltipTrigger asChild>
+                  <button
+                    onClick={() => navigate(item.path)}
+                    className={cn(
+                      "sidebar-link w-full",
+                      isActive && "active",
+                      collapsed && "justify-center"
+                    )}
+                  >
+                    <item.icon className="w-5 h-5 shrink-0" />
+                    {!collapsed && <span>{item.label}</span>}
+                  </button>
+                </TooltipTrigger>
+                {collapsed && (
+                  <TooltipContent side="right">
+                    {item.label}
+                  </TooltipContent>
                 )}
-              >
-                <item.icon className="w-5 h-5 shrink-0" />
-                {!collapsed && <span>{item.label}</span>}
-              </button>
+              </Tooltip>
             );
           })}
         </nav>
 
         {/* Sign Out */}
         <div className="p-3 border-t border-sidebar-border">
-          <button
-            onClick={handleSignOut}
-            className={cn(
-              "sidebar-link w-full text-destructive hover:bg-destructive/10",
-              collapsed && "justify-center"
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                onClick={handleSignOut}
+                className={cn(
+                  "sidebar-link w-full text-destructive hover:bg-destructive/10",
+                  collapsed && "justify-center"
+                )}
+              >
+                <LogOut className="w-5 h-5 shrink-0" />
+                {!collapsed && <span>Sign Out</span>}
+              </button>
+            </TooltipTrigger>
+            {collapsed && (
+              <TooltipContent side="right">
+                Sign Out
+              </TooltipContent>
             )}
-          >
-            <LogOut className="w-5 h-5 shrink-0" />
-            {!collapsed && <span>Sign Out</span>}
-          </button>
+          </Tooltip>
         </div>
       </aside>
 
