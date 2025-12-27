@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Plus, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
+import { Plus, Trash2, ChevronLeft, ChevronRight, X } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import {
@@ -326,12 +326,23 @@ const SelfMonitoring = () => {
           {/* Add Habit */}
           {showAddHabit ? (
             <div className="mt-4 space-y-3">
-              <Input
-                placeholder="Habit name..."
-                value={newHabitName}
-                onChange={(e) => setNewHabitName(e.target.value)}
-                className="bg-secondary border-border"
-              />
+              <div className="relative">
+                <Input
+                  placeholder="Habit name..."
+                  value={newHabitName}
+                  onChange={(e) => setNewHabitName(e.target.value)}
+                  className="bg-secondary border-border pr-10"
+                />
+                <button
+                  onClick={() => {
+                    setShowAddHabit(false);
+                    setNewHabitName("");
+                  }}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 p-1 hover:bg-muted rounded transition-colors"
+                >
+                  <X className="w-4 h-4 text-muted-foreground" />
+                </button>
+              </div>
               <div className="flex gap-2">
                 <Button
                   onClick={() => addHabit(true)}
