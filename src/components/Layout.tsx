@@ -35,7 +35,15 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex">
+    <div className="min-h-screen bg-background">
+      {/* Backdrop overlay with blur */}
+      {!collapsed && (
+        <div
+          className="fixed inset-0 bg-background/60 backdrop-blur-sm z-40 transition-opacity duration-300"
+          onClick={() => setCollapsed(true)}
+        />
+      )}
+
       {/* Sidebar */}
       <aside
         className={cn(
@@ -90,13 +98,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         </div>
       </aside>
 
-      {/* Main Content */}
-      <main
-        className={cn(
-          "flex-1 transition-all duration-300",
-          collapsed ? "ml-16" : "ml-60"
-        )}
-      >
+      {/* Main Content - always full width with fixed left padding for collapsed sidebar */}
+      <main className="min-h-screen ml-16">
         <div className="p-6 lg:p-8">{children}</div>
       </main>
     </div>
