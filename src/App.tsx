@@ -10,6 +10,7 @@ import Auth from "@/pages/Auth";
 import Analytics from "@/pages/Analytics";
 import SelfMonitoring from "@/pages/SelfMonitoring";
 import TradeLog from "@/pages/TradeLog";
+import StrategyHealth from "@/pages/StrategyHealth";
 import Settings from "@/pages/Settings";
 import NotFound from "@/pages/NotFound";
 
@@ -58,6 +59,16 @@ const App = () => (
                 <ProtectedRoute>
                   <Layout>
                     <TradeLog />
+                  </Layout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/strategy-health"
+              element={
+                <ProtectedRoute>
+                  <Layout>
+                    <StrategyHealth />
                   </Layout>
                 </ProtectedRoute>
               }
