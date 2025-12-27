@@ -189,16 +189,59 @@ const SelfMonitoring = () => {
     end: endOfMonth(currentMonth),
   });
 
-  const getDayColor = (date: Date) => {
+  // Calculate preview stats for the selected date based on tempSelections
+  const getPreviewStats = () => {
+    let positive = 0;
+    let negative = 0;
+    habits.forEach((habit) => {
+      if (tempSelections[habit.id]) {
+        if (habit.is_positive) {
+          positive += 1;
+        } else {
+          negative += 1;
+        }
+      }
+    });
+    return { positive, negative };
+  };
+
+  const getDayColor = (date: Date, isPreview = false) => {
     const dateStr = format(date, "yyyy-MM-dd");
-    const stats = calendarData[dateStr];
+    const selectedDateStr = format(selectedDate, "yyyy-MM-dd");
     
+    // For the selected date, show real-time preview based on tempSelections
+    if (dateStr === selectedDateStr && isPreview) {
+      const previewStats = getPreviewStats();
+      if (previewStats.positive === 0 && previewStats.negative === 0) {
+        return "bg-secondary";
+      }
+      if (previewStats.positive > previewStats.negative) return "bg-profit";
+      if (previewStats.negative > previewStats.positive) return "bg-loss";
+      return "bg-foreground";
+    }
+    
+    // For other dates, use saved calendar data
+    const stats = calendarData[dateStr];
     if (!stats) return "bg-secondary";
     
     const { positive, negative } = stats;
     if (positive > negative) return "bg-profit";
     if (negative > positive) return "bg-loss";
     return "bg-foreground";
+  };
+
+  // Check if there are unsaved changes
+  const hasUnsavedChanges = () => {
+    const savedSelections: Record<string, boolean> = {};
+    habitLogs.forEach((log) => {
+      savedSelections[log.habit_id] = log.completed;
+    });
+    
+    return habits.some((habit) => {
+      const temp = tempSelections[habit.id] || false;
+      const saved = savedSelections[habit.id] || false;
+      return temp !== saved;
+    });
   };
 
   const startDayOfWeek = startOfMonth(currentMonth).getDay();
@@ -361,6 +404,8 @@ const SelfMonitoring = () => {
               const isSelected = isSameDay(day, selectedDate);
               const isToday = isSameDay(day, today);
               const isFuture = isAfter(startOfDay(day), today);
+              const isSelectedDate = isSameDay(day, selectedDate);
+              const showPreview = isSelectedDate && hasUnsavedChanges();
               
               return (
                 <button
@@ -370,9 +415,11 @@ const SelfMonitoring = () => {
                     "aspect-square rounded-lg flex items-center justify-center text-sm font-medium transition-all",
                     !isSameMonth(day, currentMonth) && "text-muted-foreground/50",
                     isSelected && "ring-2 ring-foreground",
-                    !isSelected && !isFuture && getDayColor(day),
+                    !isSelected && !isFuture && getDayColor(day, false),
+                    isSelected && !isFuture && getDayColor(day, true),
                     isFuture && "bg-secondary text-muted-foreground",
-                    isToday && !isSelected && "ring-1 ring-muted-foreground"
+                    isToday && !isSelected && "ring-1 ring-muted-foreground",
+                    showPreview && "animate-pulse"
                   )}
                 >
                   {format(day, "d")}
