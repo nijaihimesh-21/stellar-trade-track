@@ -10,6 +10,12 @@ import {
   Menu,
   X,
   ShieldCheck,
+  FlaskConical,
+  FolderOpen,
+  Layers,
+  LineChart,
+  Cog,
+  ChevronDown,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -28,6 +34,13 @@ const navItems = [
   { icon: BookOpen, label: "Trade Log", path: "/trade-log" },
   { icon: ShieldCheck, label: "Strategy Health", path: "/strategy-health" },
   { icon: Settings, label: "Settings", path: "/settings" },
+];
+
+const backtesterItems = [
+  { icon: FolderOpen, label: "Strategies", path: "/backtester/strategies" },
+  { icon: Layers, label: "Canvas", path: "/backtester/canvas" },
+  { icon: LineChart, label: "Analytics", path: "/backtester/analytics" },
+  { icon: Cog, label: "Settings", path: "/backtester/settings" },
 ];
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
@@ -81,7 +94,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 p-3 space-y-1">
+        <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
           {navItems.map((item) => {
             const isActive = location.pathname === item.path;
             return (
@@ -107,6 +120,41 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               </Tooltip>
             );
           })}
+
+          {/* Strategy Backtester Section */}
+          <div className="pt-4 mt-4 border-t border-sidebar-border">
+            {!collapsed && (
+              <div className="flex items-center gap-2 px-3 py-2 text-xs text-muted-foreground uppercase tracking-wider">
+                <FlaskConical className="w-4 h-4" />
+                <span>Strategy Backtester</span>
+              </div>
+            )}
+            {backtesterItems.map((item) => {
+              const isActive = location.pathname === item.path;
+              return (
+                <Tooltip key={item.path}>
+                  <TooltipTrigger asChild>
+                    <button
+                      onClick={() => navigate(item.path)}
+                      className={cn(
+                        "sidebar-link w-full",
+                        isActive && "active",
+                        collapsed && "justify-center"
+                      )}
+                    >
+                      <item.icon className="w-5 h-5 shrink-0" />
+                      {!collapsed && <span>{item.label}</span>}
+                    </button>
+                  </TooltipTrigger>
+                  {collapsed && (
+                    <TooltipContent side="right">
+                      {item.label}
+                    </TooltipContent>
+                  )}
+                </Tooltip>
+              );
+            })}
+          </div>
         </nav>
 
         {/* Sign Out */}
