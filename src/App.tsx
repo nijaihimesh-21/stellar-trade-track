@@ -13,6 +13,11 @@ import TradeLog from "@/pages/TradeLog";
 import StrategyHealth from "@/pages/StrategyHealth";
 import Settings from "@/pages/Settings";
 import NotFound from "@/pages/NotFound";
+import Strategies from "@/pages/backtester/Strategies";
+import StrategyDetail from "@/pages/backtester/StrategyDetail";
+import BacktesterAnalytics from "@/pages/backtester/BacktesterAnalytics";
+import Canvas from "@/pages/backtester/Canvas";
+import BacktesterSettings from "@/pages/backtester/BacktesterSettings";
 
 const queryClient = new QueryClient();
 
@@ -79,6 +84,57 @@ const App = () => (
                 <ProtectedRoute>
                   <Layout>
                     <Settings />
+                  </Layout>
+                </ProtectedRoute>
+              }
+            />
+            {/* Strategy Backtester Routes */}
+            <Route
+              path="/backtester/strategies"
+              element={
+                <ProtectedRoute>
+                  <Layout>
+                    <Strategies />
+                  </Layout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/backtester/strategy/:id"
+              element={
+                <ProtectedRoute>
+                  <Layout>
+                    <StrategyDetail />
+                  </Layout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/backtester/analytics"
+              element={
+                <ProtectedRoute>
+                  <Layout>
+                    <BacktesterAnalytics />
+                  </Layout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/backtester/canvas"
+              element={
+                <ProtectedRoute>
+                  <Layout>
+                    <Canvas />
+                  </Layout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/backtester/settings"
+              element={
+                <ProtectedRoute>
+                  <Layout>
+                    <BacktesterSettings />
                   </Layout>
                 </ProtectedRoute>
               }

@@ -103,6 +103,101 @@ export type Database = {
         }
         Relationships: []
       }
+      strategies: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          market: string
+          name: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          market?: string
+          name: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          market?: string
+          name?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      strategy_trades: {
+        Row: {
+          created_at: string
+          direction: string
+          entry_price: number
+          id: string
+          pair: string
+          pnl: number | null
+          result: string
+          risk_reward: number | null
+          session: string
+          stop_loss: number | null
+          strategy_id: string
+          take_profit: number | null
+          trade_date: string
+          trade_time: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          direction: string
+          entry_price: number
+          id?: string
+          pair: string
+          pnl?: number | null
+          result: string
+          risk_reward?: number | null
+          session: string
+          stop_loss?: number | null
+          strategy_id: string
+          take_profit?: number | null
+          trade_date: string
+          trade_time: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          direction?: string
+          entry_price?: number
+          id?: string
+          pair?: string
+          pnl?: number | null
+          result?: string
+          risk_reward?: number | null
+          session?: string
+          stop_loss?: number | null
+          strategy_id?: string
+          take_profit?: number | null
+          trade_date?: string
+          trade_time?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "strategy_trades_strategy_id_fkey"
+            columns: ["strategy_id"]
+            isOneToOne: false
+            referencedRelation: "strategies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       trades: {
         Row: {
           created_at: string
