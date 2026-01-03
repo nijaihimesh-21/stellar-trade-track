@@ -6,11 +6,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
+import CountrySelect from "@/components/CountrySelect";
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
+  const [country, setCountry] = useState("");
   const [loading, setLoading] = useState(false);
   const { signIn, signUp } = useAuth();
   const navigate = useNavigate();
@@ -20,6 +23,16 @@ const Auth = () => {
     
     if (!email || !password) {
       toast.error("Please fill in all fields");
+      return;
+    }
+
+    if (!isLogin && !name.trim()) {
+      toast.error("Please enter your name");
+      return;
+    }
+
+    if (!isLogin && !country) {
+      toast.error("Please select your country");
       return;
     }
 
@@ -44,7 +57,7 @@ const Auth = () => {
           navigate("/");
         }
       } else {
-        const { error } = await signUp(email, password);
+        const { error } = await signUp(email, password, name.trim(), country);
         if (error) {
           if (error.message.includes("User already registered")) {
             toast.error("An account with this email already exists");
@@ -100,6 +113,34 @@ const Auth = () => {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
+            {!isLogin && (
+              <>
+                <div className="space-y-2">
+                  <Label htmlFor="name" className="text-foreground">
+                    Name
+                  </Label>
+                  <Input
+                    id="name"
+                    type="text"
+                    placeholder="Your name"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className="bg-secondary border-border"
+                    disabled={loading}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label className="text-foreground">Country</Label>
+                  <CountrySelect
+                    value={country}
+                    onChange={setCountry}
+                    disabled={loading}
+                  />
+                </div>
+              </>
+            )}
+
             <div className="space-y-2">
               <Label htmlFor="email" className="text-foreground">
                 Email
