@@ -161,7 +161,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               )}
             </Tooltip>
 
-            <CollapsibleContent className="space-y-1 mt-1">
+            <CollapsibleContent className="space-y-1 mt-1 overflow-hidden data-[state=open]:animate-accordion-down data-[state=closed]:animate-accordion-up">
               {/* Strategies (main item) */}
               <Tooltip>
                 <TooltipTrigger asChild>
