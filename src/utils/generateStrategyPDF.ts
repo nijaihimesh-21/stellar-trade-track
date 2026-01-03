@@ -519,14 +519,15 @@ export async function generateStrategyPDF(
   pdf.text("P&L Contribution by Session", margin, yPos);
   yPos += 10;
 
+  const barChartCardY = yPos;
   pdf.setFillColor(...colors.cardBg);
   pdf.setDrawColor(...colors.cardBorder);
-  pdf.roundedRect(margin, yPos, contentWidth, 70, 2, 2, "FD");
+  pdf.roundedRect(margin, barChartCardY, contentWidth, 70, 2, 2, "FD");
 
   // Draw bar chart
   const maxPnL = Math.max(...Object.values(sessionStats).map((s) => Math.abs(s.pnl)), 1);
   const barChartX = margin + 30;
-  const barChartY = yPos + 55;
+  const barChartY = barChartCardY + 55;
   const barMaxHeight = 40;
   const barWidth = 40;
   const barSpacing = (contentWidth - 60) / 3;
@@ -552,13 +553,13 @@ export async function generateStrategyPDF(
   pdf.setDrawColor(...colors.cardBorder);
   pdf.line(barChartX - 10, barChartY, barChartX + contentWidth - 70, barChartY);
 
-  yPos += 80;
+  // Update yPos to be after the bar chart card
+  yPos = barChartCardY + 70 + 15;
 
-  // Insight card - ensure it doesn't overlap with footer
-  const insightCardY = Math.min(yPos, pageHeight - 60);
+  // Insight card - now properly positioned below bar chart
   pdf.setFillColor(254, 249, 195); // Light yellow
   pdf.setDrawColor(...colors.cardBorder);
-  pdf.roundedRect(margin, insightCardY, contentWidth, 28, 2, 2, "FD");
+  pdf.roundedRect(margin, yPos, contentWidth, 28, 2, 2, "FD");
 
   pdf.setTextColor(...colors.textMuted);
   pdf.setFontSize(9);
@@ -566,7 +567,7 @@ export async function generateStrategyPDF(
     ? `Risk-adjusted outcomes suggest optimal execution windows during ${bestSession[0]} hours. The ${bestSession[0]} session demonstrated superior edge realization with ${bestSession[1].winRate.toFixed(1)}% success rate across ${bestSession[1].trades} executions.`
     : "Continue data collection to identify optimal execution windows.";
   const insightSplit = pdf.splitTextToSize(insightText, contentWidth - 12);
-  pdf.text(insightSplit, margin + 6, insightCardY + 11);
+  pdf.text(insightSplit, margin + 6, yPos + 11);
 
   // Footer
   pdf.setDrawColor(...colors.cardBorder);
@@ -721,19 +722,18 @@ export async function generateStrategyPDF(
     yPos += rowHeight;
   });
 
-  yPos += 12;
+  yPos += 15;
 
-  // Risk insight card - ensure it doesn't overlap with footer
-  const riskCardY = Math.min(yPos, pageHeight - 60);
+  // Risk insight card - now properly positioned below table
   pdf.setFillColor(254, 249, 195);
   pdf.setDrawColor(...colors.cardBorder);
-  pdf.roundedRect(margin, riskCardY, contentWidth, 28, 2, 2, "FD");
+  pdf.roundedRect(margin, yPos, contentWidth, 28, 2, 2, "FD");
 
   pdf.setTextColor(...colors.textMuted);
   pdf.setFontSize(9);
   const riskInsight = `Risk metrics remain within acceptable parameters. Maximum drawdown of ${formatPnL(-maxDrawdown)} represents controlled variance relative to overall portfolio performance.`;
   const riskSplit = pdf.splitTextToSize(riskInsight, contentWidth - 12);
-  pdf.text(riskSplit, margin + 6, riskCardY + 11);
+  pdf.text(riskSplit, margin + 6, yPos + 11);
 
   // Footer
   pdf.setDrawColor(...colors.cardBorder);
