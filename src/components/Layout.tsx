@@ -10,10 +10,10 @@ import {
   X,
   ShieldCheck,
   FlaskConical,
-  FolderOpen,
   Layers,
   LineChart,
   Cog,
+  ChevronDown,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -21,6 +21,12 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -33,8 +39,7 @@ const navItems = [
   { icon: Settings, label: "Settings", path: "/settings" },
 ];
 
-const backtesterItems = [
-  { icon: FolderOpen, label: "Strategies", path: "/backtester/strategies" },
+const backtesterDropdownItems = [
   { icon: Layers, label: "Canvas", path: "/backtester/canvas" },
   { icon: LineChart, label: "Analytics", path: "/backtester/analytics" },
   { icon: Cog, label: "Settings", path: "/backtester/settings" },
@@ -120,37 +125,59 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
           {/* Strategy Backtester Section */}
           <div className="pt-4 mt-4 border-t border-sidebar-border">
-            {!collapsed && (
-              <div className="flex items-center gap-2 px-3 py-2 text-xs text-muted-foreground uppercase tracking-wider">
-                <FlaskConical className="w-4 h-4" />
-                <span>Strategy Backtester</span>
-              </div>
-            )}
-            {backtesterItems.map((item) => {
-              const isActive = location.pathname === item.path;
-              return (
-                <Tooltip key={item.path}>
-                  <TooltipTrigger asChild>
-                    <button
-                      onClick={() => navigate(item.path)}
-                      className={cn(
-                        "sidebar-link w-full",
-                        isActive && "active",
-                        collapsed && "justify-center"
-                      )}
-                    >
-                      <item.icon className="w-5 h-5 shrink-0" />
-                      {!collapsed && <span>{item.label}</span>}
+            <div className="flex items-center gap-1">
+              {/* Main clickable button - navigates to Strategies */}
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    onClick={() => navigate("/backtester/strategies")}
+                    className={cn(
+                      "sidebar-link flex-1",
+                      location.pathname.startsWith("/backtester") && "active",
+                      collapsed && "justify-center"
+                    )}
+                  >
+                    <FlaskConical className="w-5 h-5 shrink-0" />
+                    {!collapsed && <span>Strategy Backtester</span>}
+                  </button>
+                </TooltipTrigger>
+                {collapsed && (
+                  <TooltipContent side="right">
+                    Strategy Backtester
+                  </TooltipContent>
+                )}
+              </Tooltip>
+
+              {/* Dropdown for other items */}
+              {!collapsed && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button className="p-2 rounded-lg hover:bg-sidebar-accent transition-colors text-sidebar-foreground">
+                      <ChevronDown className="w-4 h-4" />
                     </button>
-                  </TooltipTrigger>
-                  {collapsed && (
-                    <TooltipContent side="right">
-                      {item.label}
-                    </TooltipContent>
-                  )}
-                </Tooltip>
-              );
-            })}
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent 
+                    side="right" 
+                    align="start"
+                    className="w-40 bg-popover border border-border shadow-lg z-[60]"
+                  >
+                    {backtesterDropdownItems.map((item) => (
+                      <DropdownMenuItem
+                        key={item.path}
+                        onClick={() => navigate(item.path)}
+                        className={cn(
+                          "flex items-center gap-2 cursor-pointer",
+                          location.pathname === item.path && "bg-accent"
+                        )}
+                      >
+                        <item.icon className="w-4 h-4" />
+                        <span>{item.label}</span>
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
+            </div>
           </div>
         </nav>
 
