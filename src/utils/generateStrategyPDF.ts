@@ -448,21 +448,21 @@ export async function generateStrategyPDF(
   yPos = margin;
 
   pdf.setTextColor(...colors.textDark);
-  pdf.setFontSize(20);
+  pdf.setFontSize(18);
   pdf.setFont("helvetica", "bold");
   pdf.text("SESSION-BASED ANALYSIS", margin, yPos);
-  yPos += 5;
+  yPos += 4;
   drawAccentLine(yPos);
-  yPos += 15;
+  yPos += 10;
 
   pdf.setTextColor(...colors.textMuted);
-  pdf.setFontSize(10);
+  pdf.setFontSize(9);
   pdf.text("Performance attribution by trading session reveals execution patterns and optimal market timing.", margin, yPos);
-  yPos += 20;
+  yPos += 12;
 
-  // Session cards (3 columns with colored headers)
-  const sessionCardWidth = (contentWidth - 16) / 3;
-  const sessionCardHeight = 100;
+  // Session cards (3 columns with colored headers) - more compact
+  const sessionCardWidth = (contentWidth - 12) / 3;
+  const sessionCardHeight = 80;
   const sessionColors: Record<string, [number, number, number]> = {
     Asia: colors.purple,
     London: colors.accent,
@@ -470,20 +470,20 @@ export async function generateStrategyPDF(
   };
 
   Object.entries(sessionStats).forEach(([session, stats], i) => {
-    const x = margin + i * (sessionCardWidth + 8);
+    const x = margin + i * (sessionCardWidth + 6);
 
     // Colored header
     pdf.setFillColor(...sessionColors[session]);
-    pdf.roundedRect(x, yPos, sessionCardWidth, 18, 2, 2, "F");
+    pdf.roundedRect(x, yPos, sessionCardWidth, 16, 2, 2, "F");
     pdf.setTextColor(...colors.lightBg);
-    pdf.setFontSize(9);
+    pdf.setFontSize(8);
     pdf.setFont("helvetica", "bold");
-    pdf.text(`${session.toUpperCase()} SESSION`, x + sessionCardWidth / 2, yPos + 11, { align: "center" });
+    pdf.text(`${session.toUpperCase()} SESSION`, x + sessionCardWidth / 2, yPos + 10, { align: "center" });
 
     // Card body
     pdf.setFillColor(...colors.cardBg);
     pdf.setDrawColor(...colors.cardBorder);
-    pdf.roundedRect(x, yPos + 18, sessionCardWidth, sessionCardHeight - 18, 0, 0, "FD");
+    pdf.roundedRect(x, yPos + 16, sessionCardWidth, sessionCardHeight - 16, 0, 0, "FD");
 
     const rows = [
       { label: "Trades", value: stats.trades.toString() },
@@ -493,11 +493,11 @@ export async function generateStrategyPDF(
     ];
 
     rows.forEach((row, j) => {
-      const rowY = yPos + 30 + j * 18;
+      const rowY = yPos + 28 + j * 14;
       pdf.setTextColor(...colors.textMuted);
-      pdf.setFontSize(9);
+      pdf.setFontSize(8);
       pdf.setFont("helvetica", "normal");
-      pdf.text(row.label, x + 8, rowY);
+      pdf.text(row.label, x + 6, rowY);
 
       if (row.isGreen !== undefined) {
         const color = row.isGreen ? colors.green : colors.red;
@@ -506,30 +506,31 @@ export async function generateStrategyPDF(
         pdf.setTextColor(...colors.textDark);
       }
       pdf.setFont("helvetica", "bold");
-      pdf.text(row.value, x + sessionCardWidth - 8, rowY, { align: "right" });
+      pdf.text(row.value, x + sessionCardWidth - 6, rowY, { align: "right" });
     });
   });
 
-  yPos += sessionCardHeight + 25;
+  yPos += sessionCardHeight + 12;
 
-  // P&L Contribution by Session (Bar chart)
+  // P&L Contribution by Session (Bar chart) - more compact
   pdf.setTextColor(...colors.textDark);
-  pdf.setFontSize(14);
+  pdf.setFontSize(12);
   pdf.setFont("helvetica", "bold");
   pdf.text("P&L Contribution by Session", margin, yPos);
-  yPos += 10;
+  yPos += 8;
 
   const barChartCardY = yPos;
+  const barChartCardHeight = 60;
   pdf.setFillColor(...colors.cardBg);
   pdf.setDrawColor(...colors.cardBorder);
-  pdf.roundedRect(margin, barChartCardY, contentWidth, 70, 2, 2, "FD");
+  pdf.roundedRect(margin, barChartCardY, contentWidth, barChartCardHeight, 2, 2, "FD");
 
   // Draw bar chart
   const maxPnL = Math.max(...Object.values(sessionStats).map((s) => Math.abs(s.pnl)), 1);
   const barChartX = margin + 30;
-  const barChartY = barChartCardY + 55;
-  const barMaxHeight = 40;
-  const barWidth = 40;
+  const barChartY = barChartCardY + 48;
+  const barMaxHeight = 35;
+  const barWidth = 35;
   const barSpacing = (contentWidth - 60) / 3;
 
   Object.entries(sessionStats).forEach(([session, stats], i) => {
@@ -543,10 +544,10 @@ export async function generateStrategyPDF(
 
     // Session label
     pdf.setTextColor(...colors.textMuted);
-    pdf.setFontSize(8);
+    pdf.setFontSize(7);
     pdf.setFont("helvetica", "normal");
     const label = session === "New York" ? "New York" : session;
-    pdf.text(label, barX + barWidth / 2, barChartY + 8, { align: "center" });
+    pdf.text(label, barX + barWidth / 2, barChartY + 7, { align: "center" });
   });
 
   // Baseline
@@ -554,20 +555,20 @@ export async function generateStrategyPDF(
   pdf.line(barChartX - 10, barChartY, barChartX + contentWidth - 70, barChartY);
 
   // Update yPos to be after the bar chart card
-  yPos = barChartCardY + 70 + 15;
+  yPos = barChartCardY + barChartCardHeight + 10;
 
   // Insight card - now properly positioned below bar chart
   pdf.setFillColor(254, 249, 195); // Light yellow
   pdf.setDrawColor(...colors.cardBorder);
-  pdf.roundedRect(margin, yPos, contentWidth, 28, 2, 2, "FD");
+  pdf.roundedRect(margin, yPos, contentWidth, 26, 2, 2, "FD");
 
   pdf.setTextColor(...colors.textMuted);
-  pdf.setFontSize(9);
+  pdf.setFontSize(8);
   const insightText = bestSession && bestSession[1].trades > 0
     ? `Risk-adjusted outcomes suggest optimal execution windows during ${bestSession[0]} hours. The ${bestSession[0]} session demonstrated superior edge realization with ${bestSession[1].winRate.toFixed(1)}% success rate across ${bestSession[1].trades} executions.`
     : "Continue data collection to identify optimal execution windows.";
   const insightSplit = pdf.splitTextToSize(insightText, contentWidth - 12);
-  pdf.text(insightSplit, margin + 6, yPos + 11);
+  pdf.text(insightSplit, margin + 6, yPos + 10);
 
   // Footer
   pdf.setDrawColor(...colors.cardBorder);
