@@ -22,11 +22,10 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -36,10 +35,9 @@ const navItems = [
   { icon: BarChart3, label: "Overall Analytics", path: "/" },
   { icon: BookOpen, label: "Trade Log", path: "/trade-log" },
   { icon: ShieldCheck, label: "Strategy Health", path: "/strategy-health" },
-  { icon: Settings, label: "Settings", path: "/settings" },
 ];
 
-const backtesterDropdownItems = [
+const backtesterSubItems = [
   { icon: Layers, label: "Canvas", path: "/backtester/canvas" },
   { icon: LineChart, label: "Analytics", path: "/backtester/analytics" },
   { icon: Cog, label: "Settings", path: "/backtester/settings" },
@@ -47,6 +45,7 @@ const backtesterDropdownItems = [
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   const [collapsed, setCollapsed] = useState(false);
+  const [backtesterOpen, setBacktesterOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const { signOut } = useAuth();
@@ -55,6 +54,13 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     await signOut();
     navigate("/auth");
   };
+
+  // Auto-open backtester section if on a backtester route
+  React.useEffect(() => {
+    if (location.pathname.startsWith("/backtester")) {
+      setBacktesterOpen(true);
+    }
+  }, [location.pathname]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -123,62 +129,111 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             );
           })}
 
-          {/* Strategy Backtester Section */}
-          <div className="pt-4 mt-4 border-t border-sidebar-border">
-            <div className="flex items-center gap-1">
-              {/* Main clickable button - navigates to Strategies */}
-              <Tooltip>
-                <TooltipTrigger asChild>
+          {/* Strategy Backtester Section - Collapsible */}
+          <Collapsible open={backtesterOpen} onOpenChange={setBacktesterOpen}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <CollapsibleTrigger asChild>
                   <button
-                    onClick={() => navigate("/backtester/strategies")}
                     className={cn(
-                      "sidebar-link flex-1",
+                      "sidebar-link w-full",
                       location.pathname.startsWith("/backtester") && "active",
                       collapsed && "justify-center"
                     )}
                   >
                     <FlaskConical className="w-5 h-5 shrink-0" />
-                    {!collapsed && <span>Strategy Backtester</span>}
+                    {!collapsed && (
+                      <>
+                        <span className="flex-1 text-left">Strategy Backtester</span>
+                        <ChevronDown className={cn(
+                          "w-4 h-4 transition-transform",
+                          backtesterOpen && "rotate-180"
+                        )} />
+                      </>
+                    )}
+                  </button>
+                </CollapsibleTrigger>
+              </TooltipTrigger>
+              {collapsed && (
+                <TooltipContent side="right">
+                  Strategy Backtester
+                </TooltipContent>
+              )}
+            </Tooltip>
+
+            <CollapsibleContent className="space-y-1 mt-1">
+              {/* Strategies (main item) */}
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    onClick={() => navigate("/backtester/strategies")}
+                    className={cn(
+                      "sidebar-link w-full",
+                      location.pathname === "/backtester/strategies" && "active",
+                      collapsed ? "justify-center" : "pl-8"
+                    )}
+                  >
+                    <FlaskConical className="w-4 h-4 shrink-0" />
+                    {!collapsed && <span>Strategies</span>}
                   </button>
                 </TooltipTrigger>
                 {collapsed && (
                   <TooltipContent side="right">
-                    Strategy Backtester
+                    Strategies
                   </TooltipContent>
                 )}
               </Tooltip>
 
-              {/* Dropdown for other items */}
-              {!collapsed && (
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <button className="p-2 rounded-lg hover:bg-sidebar-accent transition-colors text-sidebar-foreground">
-                      <ChevronDown className="w-4 h-4" />
-                    </button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent 
-                    side="right" 
-                    align="start"
-                    className="w-40 bg-popover border border-border shadow-lg z-[60]"
-                  >
-                    {backtesterDropdownItems.map((item) => (
-                      <DropdownMenuItem
-                        key={item.path}
+              {/* Other sub-items */}
+              {backtesterSubItems.map((item) => {
+                const isActive = location.pathname === item.path;
+                return (
+                  <Tooltip key={item.path}>
+                    <TooltipTrigger asChild>
+                      <button
                         onClick={() => navigate(item.path)}
                         className={cn(
-                          "flex items-center gap-2 cursor-pointer",
-                          location.pathname === item.path && "bg-accent"
+                          "sidebar-link w-full",
+                          isActive && "active",
+                          collapsed ? "justify-center" : "pl-8"
                         )}
                       >
-                        <item.icon className="w-4 h-4" />
-                        <span>{item.label}</span>
-                      </DropdownMenuItem>
-                    ))}
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              )}
-            </div>
-          </div>
+                        <item.icon className="w-4 h-4 shrink-0" />
+                        {!collapsed && <span>{item.label}</span>}
+                      </button>
+                    </TooltipTrigger>
+                    {collapsed && (
+                      <TooltipContent side="right">
+                        {item.label}
+                      </TooltipContent>
+                    )}
+                  </Tooltip>
+                );
+              })}
+            </CollapsibleContent>
+          </Collapsible>
+
+          {/* Settings */}
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                onClick={() => navigate("/settings")}
+                className={cn(
+                  "sidebar-link w-full",
+                  location.pathname === "/settings" && "active",
+                  collapsed && "justify-center"
+                )}
+              >
+                <Settings className="w-5 h-5 shrink-0" />
+                {!collapsed && <span>Settings</span>}
+              </button>
+            </TooltipTrigger>
+            {collapsed && (
+              <TooltipContent side="right">
+                Settings
+              </TooltipContent>
+            )}
+          </Tooltip>
         </nav>
 
         {/* Sign Out */}
