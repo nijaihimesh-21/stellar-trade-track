@@ -6,7 +6,6 @@ import { useAuth } from "@/contexts/AuthContext";
 import {
   ArrowLeft,
   Plus,
-  FileText,
   Trash2,
   BarChart3,
   TrendingUp,
@@ -14,14 +13,16 @@ import {
   Percent,
   Target,
   Activity,
+  Download,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
-import { format } from "date-fns";
+
 import LogTradeModal from "@/components/backtester/LogTradeModal";
 import TradesTable from "@/components/backtester/TradesTable";
 import StrategySettings from "@/components/backtester/StrategySettings";
+import { generateStrategyPDF } from "@/utils/generateStrategyPDF";
 
 interface StrategyTrade {
   id: string;
@@ -190,9 +191,16 @@ const StrategyDetail: React.FC = () => {
         <div className="flex items-center gap-3">
           <Button
             variant="outline"
+            onClick={() => {
+              if (strategy && trades) {
+                generateStrategyPDF(strategy, trades);
+                toast.success("PDF report generated!");
+              }
+            }}
+            disabled={trades.length === 0}
             className="border-border text-foreground hover:bg-muted"
           >
-            <FileText className="w-4 h-4 mr-2" />
+            <Download className="w-4 h-4 mr-2" />
             PDF Report
           </Button>
           <Button
