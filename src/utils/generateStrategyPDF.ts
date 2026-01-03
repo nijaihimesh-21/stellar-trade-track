@@ -366,8 +366,8 @@ export async function generateStrategyPDF(
   pdf.text("Trade Outcome Distribution", margin, yPos);
   yPos += 10;
 
-  // Pie chart (simple circle representation)
-  const pieRadius = 35;
+  // Pie chart (smaller to avoid footer overlap)
+  const pieRadius = 25;
   const pieX = margin + pieRadius + 10;
   const pieY = yPos + pieRadius + 5;
 
@@ -415,30 +415,30 @@ export async function generateStrategyPDF(
     pdf.circle(pieX, pieY, pieRadius, "S");
   }
 
-  // Legend
-  const legendX = pieX + pieRadius + 30;
-  const legendY = pieY - 10;
+  // Legend (positioned to the right of the smaller pie)
+  const legendX = pieX + pieRadius + 25;
+  const legendY = pieY - 8;
 
   // Wins legend
   pdf.setFillColor(...colors.green);
-  pdf.rect(legendX, legendY, 12, 12, "F");
+  pdf.rect(legendX, legendY, 10, 10, "F");
   pdf.setTextColor(...colors.textDark);
-  pdf.setFontSize(10);
-  pdf.text(`Wins: ${wins} (${winRate.toFixed(1)}%)`, legendX + 18, legendY + 9);
+  pdf.setFontSize(9);
+  pdf.text(`Wins: ${wins} (${winRate.toFixed(1)}%)`, legendX + 15, legendY + 8);
 
   // Losses legend
   pdf.setFillColor(...colors.red);
-  pdf.rect(legendX, legendY + 22, 12, 12, "F");
+  pdf.rect(legendX, legendY + 18, 10, 10, "F");
   pdf.setTextColor(...colors.textDark);
-  pdf.text(`Losses: ${losses} (${lossRate.toFixed(1)}%)`, legendX + 18, legendY + 31);
+  pdf.text(`Losses: ${losses} (${lossRate.toFixed(1)}%)`, legendX + 15, legendY + 26);
 
   // Footer
   pdf.setDrawColor(...colors.cardBorder);
-  pdf.line(margin, pageHeight - 15, pageWidth - margin, pageHeight - 15);
+  pdf.line(margin, pageHeight - 20, pageWidth - margin, pageHeight - 20);
   pdf.setTextColor(...colors.textMuted);
   pdf.setFontSize(8);
-  pdf.text("CONFIDENTIAL — Trading Performance Review", margin, pageHeight - 8);
-  pdf.text("Page 1 of 5", pageWidth - margin, pageHeight - 8, { align: "right" });
+  pdf.text("CONFIDENTIAL — Trading Performance Review", margin, pageHeight - 12);
+  pdf.text("Page 1 of 5", pageWidth - margin, pageHeight - 12, { align: "right" });
 
   // ==================== PAGE 3: SESSION ANALYSIS ====================
   pdf.addPage();
@@ -552,12 +552,13 @@ export async function generateStrategyPDF(
   pdf.setDrawColor(...colors.cardBorder);
   pdf.line(barChartX - 10, barChartY, barChartX + contentWidth - 70, barChartY);
 
-  yPos += 85;
+  yPos += 80;
 
-  // Insight card
+  // Insight card - ensure it doesn't overlap with footer
+  const insightCardY = Math.min(yPos, pageHeight - 60);
   pdf.setFillColor(254, 249, 195); // Light yellow
   pdf.setDrawColor(...colors.cardBorder);
-  pdf.roundedRect(margin, yPos, contentWidth, 30, 2, 2, "FD");
+  pdf.roundedRect(margin, insightCardY, contentWidth, 28, 2, 2, "FD");
 
   pdf.setTextColor(...colors.textMuted);
   pdf.setFontSize(9);
@@ -565,15 +566,15 @@ export async function generateStrategyPDF(
     ? `Risk-adjusted outcomes suggest optimal execution windows during ${bestSession[0]} hours. The ${bestSession[0]} session demonstrated superior edge realization with ${bestSession[1].winRate.toFixed(1)}% success rate across ${bestSession[1].trades} executions.`
     : "Continue data collection to identify optimal execution windows.";
   const insightSplit = pdf.splitTextToSize(insightText, contentWidth - 12);
-  pdf.text(insightSplit, margin + 6, yPos + 12);
+  pdf.text(insightSplit, margin + 6, insightCardY + 11);
 
   // Footer
   pdf.setDrawColor(...colors.cardBorder);
-  pdf.line(margin, pageHeight - 15, pageWidth - margin, pageHeight - 15);
+  pdf.line(margin, pageHeight - 20, pageWidth - margin, pageHeight - 20);
   pdf.setTextColor(...colors.textMuted);
   pdf.setFontSize(8);
-  pdf.text("CONFIDENTIAL — Trading Performance Review", margin, pageHeight - 8);
-  pdf.text("Page 2 of 5", pageWidth - margin, pageHeight - 8, { align: "right" });
+  pdf.text("CONFIDENTIAL — Trading Performance Review", margin, pageHeight - 12);
+  pdf.text("Page 2 of 5", pageWidth - margin, pageHeight - 12, { align: "right" });
 
   // ==================== PAGE 4: RISK & BEHAVIOR ====================
   pdf.addPage();
@@ -720,26 +721,27 @@ export async function generateStrategyPDF(
     yPos += rowHeight;
   });
 
-  yPos += 15;
+  yPos += 12;
 
-  // Risk insight card
+  // Risk insight card - ensure it doesn't overlap with footer
+  const riskCardY = Math.min(yPos, pageHeight - 60);
   pdf.setFillColor(254, 249, 195);
   pdf.setDrawColor(...colors.cardBorder);
-  pdf.roundedRect(margin, yPos, contentWidth, 30, 2, 2, "FD");
+  pdf.roundedRect(margin, riskCardY, contentWidth, 28, 2, 2, "FD");
 
   pdf.setTextColor(...colors.textMuted);
   pdf.setFontSize(9);
   const riskInsight = `Risk metrics remain within acceptable parameters. Maximum drawdown of ${formatPnL(-maxDrawdown)} represents controlled variance relative to overall portfolio performance.`;
   const riskSplit = pdf.splitTextToSize(riskInsight, contentWidth - 12);
-  pdf.text(riskSplit, margin + 6, yPos + 12);
+  pdf.text(riskSplit, margin + 6, riskCardY + 11);
 
   // Footer
   pdf.setDrawColor(...colors.cardBorder);
-  pdf.line(margin, pageHeight - 15, pageWidth - margin, pageHeight - 15);
+  pdf.line(margin, pageHeight - 20, pageWidth - margin, pageHeight - 20);
   pdf.setTextColor(...colors.textMuted);
   pdf.setFontSize(8);
-  pdf.text("CONFIDENTIAL — Trading Performance Review", margin, pageHeight - 8);
-  pdf.text("Page 3 of 5", pageWidth - margin, pageHeight - 8, { align: "right" });
+  pdf.text("CONFIDENTIAL — Trading Performance Review", margin, pageHeight - 12);
+  pdf.text("Page 3 of 5", pageWidth - margin, pageHeight - 12, { align: "right" });
 
   // ==================== PAGE 5: INSTRUMENT ANALYSIS ====================
   pdf.addPage();
@@ -828,11 +830,11 @@ export async function generateStrategyPDF(
 
   // Footer
   pdf.setDrawColor(...colors.cardBorder);
-  pdf.line(margin, pageHeight - 15, pageWidth - margin, pageHeight - 15);
+  pdf.line(margin, pageHeight - 20, pageWidth - margin, pageHeight - 20);
   pdf.setTextColor(...colors.textMuted);
   pdf.setFontSize(8);
-  pdf.text("CONFIDENTIAL — Trading Performance Review", margin, pageHeight - 8);
-  pdf.text("Page 4 of 5", pageWidth - margin, pageHeight - 8, { align: "right" });
+  pdf.text("CONFIDENTIAL — Trading Performance Review", margin, pageHeight - 12);
+  pdf.text("Page 4 of 5", pageWidth - margin, pageHeight - 12, { align: "right" });
 
   // ==================== PAGE 6: KEY TAKEAWAYS ====================
   pdf.addPage();
@@ -897,11 +899,11 @@ export async function generateStrategyPDF(
 
   // Footer
   pdf.setDrawColor(...colors.cardBorder);
-  pdf.line(margin, pageHeight - 15, pageWidth - margin, pageHeight - 15);
+  pdf.line(margin, pageHeight - 20, pageWidth - margin, pageHeight - 20);
   pdf.setTextColor(...colors.textMuted);
   pdf.setFontSize(8);
-  pdf.text("CONFIDENTIAL — Trading Performance Review", margin, pageHeight - 8);
-  pdf.text("Page 5 of 5", pageWidth - margin, pageHeight - 8, { align: "right" });
+  pdf.text("CONFIDENTIAL — Trading Performance Review", margin, pageHeight - 12);
+  pdf.text("Page 5 of 5", pageWidth - margin, pageHeight - 12, { align: "right" });
 
   // Save PDF
   const fileName = `${strategy.name.replace(/\s+/g, "_")}_Performance_Report_${new Date().toISOString().split("T")[0]}.pdf`;
