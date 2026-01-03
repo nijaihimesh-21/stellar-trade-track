@@ -586,14 +586,15 @@ export async function generateStrategyPDF(
   yPos = margin;
 
   pdf.setTextColor(...colors.textDark);
-  pdf.setFontSize(20);
+  pdf.setFontSize(18);
   pdf.setFont("helvetica", "bold");
   pdf.text("RISK & BEHAVIOR ANALYSIS", margin, yPos);
-  yPos += 5;
+  yPos += 4;
   drawAccentLine(yPos);
-  yPos += 20;
+  yPos += 12;
 
-  // Risk metrics cards (4 columns)
+  // Risk metrics cards (4 columns) - more compact
+  const riskCardHeight = 36;
   const riskMetrics = [
     { label: "Largest Win", value: largestWin > 0 ? formatPnL(largestWin) : "N/A", sublabel: sortedPairs[0] ? `${sortedPairs[0][0]} · ${tradeDates[0]?.toLocaleDateString("en-US", { month: "short", day: "numeric" })}` : "" },
     { label: "Largest Loss", value: largestLoss < 0 ? formatPnL(largestLoss) : "N/A" },
@@ -605,38 +606,38 @@ export async function generateStrategyPDF(
     const x = margin + i * (cardWidth + 4);
     pdf.setFillColor(...colors.cardBg);
     pdf.setDrawColor(...colors.cardBorder);
-    pdf.roundedRect(x, yPos, cardWidth, 42, 2, 2, "FD");
+    pdf.roundedRect(x, yPos, cardWidth, riskCardHeight, 2, 2, "FD");
 
     pdf.setTextColor(...colors.textMuted);
-    pdf.setFontSize(8);
+    pdf.setFontSize(7);
     pdf.setFont("helvetica", "normal");
-    pdf.text(metric.label, x + 6, yPos + 10);
+    pdf.text(metric.label, x + 5, yPos + 8);
 
     pdf.setTextColor(...colors.textDark);
-    pdf.setFontSize(16);
+    pdf.setFontSize(14);
     pdf.setFont("helvetica", "bold");
-    pdf.text(metric.value, x + 6, yPos + 26);
+    pdf.text(metric.value, x + 5, yPos + 20);
 
     if (metric.sublabel) {
       pdf.setTextColor(...colors.textMuted);
-      pdf.setFontSize(7);
+      pdf.setFontSize(6);
       pdf.setFont("helvetica", "normal");
-      pdf.text(metric.sublabel, x + 6, yPos + 36);
+      pdf.text(metric.sublabel, x + 5, yPos + 30);
     }
   });
 
-  yPos += 55;
+  yPos += riskCardHeight + 10;
 
-  // Execution Patterns
+  // Execution Patterns - more compact
   pdf.setTextColor(...colors.textDark);
-  pdf.setFontSize(14);
+  pdf.setFontSize(12);
   pdf.setFont("helvetica", "bold");
   pdf.text("Execution Patterns", margin, yPos);
-  yPos += 10;
+  yPos += 8;
 
   pdf.setFillColor(...colors.cardBg);
   pdf.setDrawColor(...colors.cardBorder);
-  pdf.roundedRect(margin, yPos, contentWidth, 40, 2, 2, "FD");
+  pdf.roundedRect(margin, yPos, contentWidth, 32, 2, 2, "FD");
 
   const patterns = [
     [`Best Win Streak: ${bestWinStreak} consecutive`, `Avg Win: ${formatPnL(avgWin)}`],
@@ -644,40 +645,40 @@ export async function generateStrategyPDF(
   ];
 
   patterns.forEach((row, i) => {
-    const rowY = yPos + 14 + i * 14;
+    const rowY = yPos + 11 + i * 12;
     pdf.setTextColor(...colors.textDark);
-    pdf.setFontSize(9);
+    pdf.setFontSize(8);
     pdf.setFont("helvetica", "normal");
-    pdf.text(row[0], margin + 10, rowY);
+    pdf.text(row[0], margin + 8, rowY);
     const patternColor = i === 0 ? colors.green : colors.red;
     pdf.setTextColor(patternColor[0], patternColor[1], patternColor[2]);
     pdf.text(row[1], margin + contentWidth / 2, rowY);
   });
 
-  yPos += 55;
+  yPos += 40;
 
-  // Time & Frequency Insights
+  // Time & Frequency Insights - more compact
   pdf.setTextColor(...colors.textDark);
-  pdf.setFontSize(14);
+  pdf.setFontSize(12);
   pdf.setFont("helvetica", "bold");
   pdf.text("Time & Frequency Insights", margin, yPos);
-  yPos += 10;
+  yPos += 8;
 
   // Day table
   const tableWidth = contentWidth;
   const colWidths = [tableWidth * 0.3, tableWidth * 0.2, tableWidth * 0.25, tableWidth * 0.25];
-  const rowHeight = 14;
+  const rowHeight = 12;
 
   // Table header
   pdf.setFillColor(...colors.tableHeader);
   pdf.rect(margin, yPos, tableWidth, rowHeight, "F");
   pdf.setTextColor(...colors.lightBg);
-  pdf.setFontSize(8);
+  pdf.setFontSize(7);
   pdf.setFont("helvetica", "bold");
   
-  let colX = margin + 8;
+  let colX = margin + 6;
   ["Day", "Trades", "Win Rate", "Net P&L"].forEach((header, i) => {
-    pdf.text(header, colX, yPos + 9);
+    pdf.text(header, colX, yPos + 8);
     colX += colWidths[i];
   });
 
@@ -695,46 +696,46 @@ export async function generateStrategyPDF(
     }
 
     pdf.setTextColor(...colors.textDark);
-    pdf.setFontSize(9);
+    pdf.setFontSize(8);
     pdf.setFont("helvetica", "normal");
 
-    colX = margin + 8;
-    pdf.text(day, colX, yPos + 9);
+    colX = margin + 6;
+    pdf.text(day, colX, yPos + 8);
     colX += colWidths[0];
 
-    pdf.text(stats.trades.toString(), colX, yPos + 9);
+    pdf.text(stats.trades.toString(), colX, yPos + 8);
     colX += colWidths[1];
 
     if (stats.trades > 0) {
       pdf.setTextColor(...colors.green);
-      pdf.text(`${stats.winRate.toFixed(1)}%`, colX, yPos + 9);
+      pdf.text(`${stats.winRate.toFixed(1)}%`, colX, yPos + 8);
       colX += colWidths[2];
 
       const pnlColor = stats.pnl >= 0 ? colors.green : colors.red;
       pdf.setTextColor(pnlColor[0], pnlColor[1], pnlColor[2]);
-      pdf.text(formatPnL(stats.pnl), colX, yPos + 9);
+      pdf.text(formatPnL(stats.pnl), colX, yPos + 8);
     } else {
       pdf.setTextColor(...colors.textMuted);
-      pdf.text("—", colX, yPos + 9);
+      pdf.text("—", colX, yPos + 8);
       colX += colWidths[2];
-      pdf.text("—", colX, yPos + 9);
+      pdf.text("—", colX, yPos + 8);
     }
 
     yPos += rowHeight;
   });
 
-  yPos += 15;
+  yPos += 10;
 
   // Risk insight card - now properly positioned below table
   pdf.setFillColor(254, 249, 195);
   pdf.setDrawColor(...colors.cardBorder);
-  pdf.roundedRect(margin, yPos, contentWidth, 28, 2, 2, "FD");
+  pdf.roundedRect(margin, yPos, contentWidth, 26, 2, 2, "FD");
 
   pdf.setTextColor(...colors.textMuted);
-  pdf.setFontSize(9);
+  pdf.setFontSize(8);
   const riskInsight = `Risk metrics remain within acceptable parameters. Maximum drawdown of ${formatPnL(-maxDrawdown)} represents controlled variance relative to overall portfolio performance.`;
   const riskSplit = pdf.splitTextToSize(riskInsight, contentWidth - 12);
-  pdf.text(riskSplit, margin + 6, yPos + 11);
+  pdf.text(riskSplit, margin + 6, yPos + 10);
 
   // Footer
   pdf.setDrawColor(...colors.cardBorder);
