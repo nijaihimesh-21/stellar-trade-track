@@ -3,7 +3,6 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import {
   BarChart3,
-  Target,
   BookOpen,
   Settings,
   LogOut,
@@ -15,7 +14,6 @@ import {
   Layers,
   LineChart,
   Cog,
-  ChevronDown,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -30,7 +28,6 @@ interface LayoutProps {
 
 const navItems = [
   { icon: BarChart3, label: "Overall Analytics", path: "/" },
-  { icon: Target, label: "Self Monitoring", path: "/self-monitoring" },
   { icon: BookOpen, label: "Trade Log", path: "/trade-log" },
   { icon: ShieldCheck, label: "Strategy Health", path: "/strategy-health" },
   { icon: Settings, label: "Settings", path: "/settings" },

@@ -14,68 +14,6 @@ export type Database = {
   }
   public: {
     Tables: {
-      habit_logs: {
-        Row: {
-          completed: boolean
-          created_at: string
-          habit_id: string
-          id: string
-          log_date: string
-          user_id: string
-        }
-        Insert: {
-          completed?: boolean
-          created_at?: string
-          habit_id: string
-          id?: string
-          log_date: string
-          user_id: string
-        }
-        Update: {
-          completed?: boolean
-          created_at?: string
-          habit_id?: string
-          id?: string
-          log_date?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "habit_logs_habit_id_fkey"
-            columns: ["habit_id"]
-            isOneToOne: false
-            referencedRelation: "habits"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      habits: {
-        Row: {
-          created_at: string
-          id: string
-          is_positive: boolean
-          name: string
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          is_positive?: boolean
-          name: string
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          is_positive?: boolean
-          name?: string
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
       profiles: {
         Row: {
           created_at: string

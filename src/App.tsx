@@ -8,7 +8,7 @@ import ProtectedRoute from "@/components/ProtectedRoute";
 import Layout from "@/components/Layout";
 import Auth from "@/pages/Auth";
 import Analytics from "@/pages/Analytics";
-import SelfMonitoring from "@/pages/SelfMonitoring";
+
 import TradeLog from "@/pages/TradeLog";
 import StrategyHealth from "@/pages/StrategyHealth";
 import Settings from "@/pages/Settings";
@@ -44,16 +44,6 @@ const App = () => (
                 <ProtectedRoute>
                   <Layout>
                     <Analytics />
-                  </Layout>
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/self-monitoring"
-              element={
-                <ProtectedRoute>
-                  <Layout>
-                    <SelfMonitoring />
                   </Layout>
                 </ProtectedRoute>
               }
