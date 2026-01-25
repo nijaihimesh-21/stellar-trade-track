@@ -1,7 +1,7 @@
 import React from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -27,12 +27,15 @@ interface Trade {
   result: string;
   pnl: number;
   risk_reward: number | null;
+  lots: number | null;
+  pips: number | null;
 }
 
 interface TradesTableProps {
   trades: Trade[];
   isLoading: boolean;
   onLogTrade: () => void;
+  onEditTrade: (trade: Trade) => void;
   strategyId: string;
 }
 
@@ -40,6 +43,7 @@ const TradesTable: React.FC<TradesTableProps> = ({
   trades,
   isLoading,
   onLogTrade,
+  onEditTrade,
   strategyId,
 }) => {
   const queryClient = useQueryClient();
@@ -98,6 +102,8 @@ const TradesTable: React.FC<TradesTableProps> = ({
             <TableHead className="text-muted-foreground">Entry</TableHead>
             <TableHead className="text-muted-foreground">SL</TableHead>
             <TableHead className="text-muted-foreground">TP</TableHead>
+            <TableHead className="text-muted-foreground">Lots</TableHead>
+            <TableHead className="text-muted-foreground">Pips</TableHead>
             <TableHead className="text-muted-foreground">R:R</TableHead>
             <TableHead className="text-muted-foreground">Result</TableHead>
             <TableHead className="text-muted-foreground">P&L</TableHead>
@@ -126,6 +132,8 @@ const TradesTable: React.FC<TradesTableProps> = ({
               <TableCell className="text-foreground">{trade.entry_price}</TableCell>
               <TableCell className="text-muted-foreground">{trade.stop_loss || "—"}</TableCell>
               <TableCell className="text-muted-foreground">{trade.take_profit || "—"}</TableCell>
+              <TableCell className="text-muted-foreground">{trade.lots || "—"}</TableCell>
+              <TableCell className="text-muted-foreground">{trade.pips || "—"}</TableCell>
               <TableCell className="text-muted-foreground">
                 {trade.risk_reward ? `1:${trade.risk_reward.toFixed(1)}` : "—"}
               </TableCell>
@@ -150,14 +158,24 @@ const TradesTable: React.FC<TradesTableProps> = ({
                 {trade.pnl >= 0 ? "+" : ""}${trade.pnl.toFixed(2)}
               </TableCell>
               <TableCell>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => deleteTrade.mutate(trade.id)}
-                  className="text-muted-foreground hover:text-destructive hover:bg-destructive/10"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </Button>
+                <div className="flex items-center gap-1">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => onEditTrade(trade)}
+                    className="text-muted-foreground hover:text-primary hover:bg-primary/10"
+                  >
+                    <Pencil className="w-4 h-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => deleteTrade.mutate(trade.id)}
+                    className="text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                </div>
               </TableCell>
             </TableRow>
           ))}

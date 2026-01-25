@@ -37,6 +37,8 @@ interface StrategyTrade {
   result: string;
   pnl: number;
   risk_reward: number | null;
+  lots: number | null;
+  pips: number | null;
 }
 
 interface Strategy {
@@ -53,6 +55,7 @@ const StrategyDetail: React.FC = () => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [isLogTradeOpen, setIsLogTradeOpen] = useState(false);
+  const [editingTrade, setEditingTrade] = useState<StrategyTrade | null>(null);
   const [activeTab, setActiveTab] = useState("overview");
 
   // Fetch strategy
@@ -418,6 +421,10 @@ const StrategyDetail: React.FC = () => {
             trades={trades}
             isLoading={tradesLoading}
             onLogTrade={() => setIsLogTradeOpen(true)}
+            onEditTrade={(trade) => {
+              setEditingTrade(trade);
+              setIsLogTradeOpen(true);
+            }}
             strategyId={id!}
           />
         </TabsContent>
@@ -431,8 +438,12 @@ const StrategyDetail: React.FC = () => {
       {/* Log Trade Modal */}
       <LogTradeModal
         open={isLogTradeOpen}
-        onOpenChange={setIsLogTradeOpen}
+        onOpenChange={(open) => {
+          setIsLogTradeOpen(open);
+          if (!open) setEditingTrade(null);
+        }}
         strategyId={id!}
+        editTrade={editingTrade}
       />
     </div>
   );

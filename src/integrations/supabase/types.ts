@@ -77,7 +77,9 @@ export type Database = {
           direction: string
           entry_price: number
           id: string
+          lots: number | null
           pair: string
+          pips: number | null
           pnl: number | null
           result: string
           risk_reward: number | null
@@ -95,7 +97,9 @@ export type Database = {
           direction: string
           entry_price: number
           id?: string
+          lots?: number | null
           pair: string
+          pips?: number | null
           pnl?: number | null
           result: string
           risk_reward?: number | null
@@ -113,7 +117,9 @@ export type Database = {
           direction?: string
           entry_price?: number
           id?: string
+          lots?: number | null
           pair?: string
+          pips?: number | null
           pnl?: number | null
           result?: string
           risk_reward?: number | null
