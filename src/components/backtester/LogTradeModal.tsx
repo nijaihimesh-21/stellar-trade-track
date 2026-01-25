@@ -1,8 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import { X } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -21,10 +20,28 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 
+interface Trade {
+  id: string;
+  pair: string;
+  direction: string;
+  trade_date: string;
+  trade_time: string;
+  session: string;
+  entry_price: number;
+  stop_loss: number | null;
+  take_profit: number | null;
+  result: string;
+  pnl: number;
+  risk_reward: number | null;
+  lots: number | null;
+  pips: number | null;
+}
+
 interface LogTradeModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   strategyId: string;
+  editTrade?: Trade | null;
 }
 
 const PAIRS = [
@@ -36,10 +53,12 @@ const LogTradeModal: React.FC<LogTradeModalProps> = ({
   open,
   onOpenChange,
   strategyId,
+  editTrade,
 }) => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
-  const [formData, setFormData] = useState({
+  
+  const getInitialFormData = () => ({
     pair: "EURUSD",
     direction: "Buy",
     trade_date: new Date().toISOString().split("T")[0],
@@ -50,13 +69,41 @@ const LogTradeModal: React.FC<LogTradeModalProps> = ({
     take_profit: "",
     result: "Win",
     pnl: "",
+    lots: "",
+    pips: "",
   });
 
-  const createTrade = useMutation({
+  const [formData, setFormData] = useState(getInitialFormData());
+
+  // Populate form when editing
+  useEffect(() => {
+    if (editTrade) {
+      setFormData({
+        pair: editTrade.pair,
+        direction: editTrade.direction,
+        trade_date: editTrade.trade_date,
+        trade_time: editTrade.trade_time.substring(0, 5),
+        session: editTrade.session,
+        entry_price: editTrade.entry_price.toString(),
+        stop_loss: editTrade.stop_loss?.toString() || "",
+        take_profit: editTrade.take_profit?.toString() || "",
+        result: editTrade.result,
+        pnl: editTrade.pnl?.toString() || "",
+        lots: editTrade.lots?.toString() || "",
+        pips: editTrade.pips?.toString() || "",
+      });
+    } else {
+      setFormData(getInitialFormData());
+    }
+  }, [editTrade, open]);
+
+  const saveTrade = useMutation({
     mutationFn: async () => {
       const entry = parseFloat(formData.entry_price);
       const sl = formData.stop_loss ? parseFloat(formData.stop_loss) : null;
       const tp = formData.take_profit ? parseFloat(formData.take_profit) : null;
+      const lots = formData.lots ? parseFloat(formData.lots) : null;
+      const pips = formData.pips ? parseFloat(formData.pips) : null;
       
       // Calculate R:R
       let riskReward = null;
@@ -66,7 +113,7 @@ const LogTradeModal: React.FC<LogTradeModalProps> = ({
         riskReward = risk > 0 ? reward / risk : null;
       }
 
-      const { error } = await supabase.from("strategy_trades").insert({
+      const tradeData = {
         user_id: user?.id,
         strategy_id: strategyId,
         pair: formData.pair,
@@ -80,31 +127,31 @@ const LogTradeModal: React.FC<LogTradeModalProps> = ({
         result: formData.result,
         pnl: formData.pnl ? parseFloat(formData.pnl) : 0,
         risk_reward: riskReward,
-      });
+        lots,
+        pips,
+      };
 
-      if (error) throw error;
+      if (editTrade) {
+        const { error } = await supabase
+          .from("strategy_trades")
+          .update(tradeData)
+          .eq("id", editTrade.id);
+        if (error) throw error;
+      } else {
+        const { error } = await supabase.from("strategy_trades").insert(tradeData);
+        if (error) throw error;
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["strategy_trades", strategyId] });
       queryClient.invalidateQueries({ queryKey: ["strategy", strategyId] });
       queryClient.invalidateQueries({ queryKey: ["strategies"] });
       onOpenChange(false);
-      toast.success("Trade logged successfully");
-      setFormData({
-        pair: "EURUSD",
-        direction: "Buy",
-        trade_date: new Date().toISOString().split("T")[0],
-        trade_time: "09:00",
-        session: "London",
-        entry_price: "",
-        stop_loss: "",
-        take_profit: "",
-        result: "Win",
-        pnl: "",
-      });
+      toast.success(editTrade ? "Trade updated successfully" : "Trade logged successfully");
+      setFormData(getInitialFormData());
     },
     onError: () => {
-      toast.error("Failed to log trade");
+      toast.error(editTrade ? "Failed to update trade" : "Failed to log trade");
     },
   });
 
@@ -113,14 +160,16 @@ const LogTradeModal: React.FC<LogTradeModalProps> = ({
       toast.error("Entry price is required");
       return;
     }
-    createTrade.mutate();
+    saveTrade.mutate();
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-card border-border max-w-lg">
+      <DialogContent className="bg-card border-border max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-xl font-bold text-foreground">Log Trade</DialogTitle>
+          <DialogTitle className="text-xl font-bold text-foreground">
+            {editTrade ? "Edit Trade" : "Log Trade"}
+          </DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4 mt-4">
@@ -242,6 +291,36 @@ const LogTradeModal: React.FC<LogTradeModalProps> = ({
             </div>
           </div>
 
+          {/* Lots & Pips */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label className="text-foreground">
+                Lots <span className="text-muted-foreground">(optional)</span>
+              </Label>
+              <Input
+                type="number"
+                step="0.01"
+                placeholder="0.10"
+                value={formData.lots}
+                onChange={(e) => setFormData({ ...formData, lots: e.target.value })}
+                className="bg-background border-border focus:border-primary focus:ring-primary/20"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label className="text-foreground">
+                Pips <span className="text-muted-foreground">(optional)</span>
+              </Label>
+              <Input
+                type="number"
+                step="0.1"
+                placeholder="25.5"
+                value={formData.pips}
+                onChange={(e) => setFormData({ ...formData, pips: e.target.value })}
+                className="bg-background border-border focus:border-primary focus:ring-primary/20"
+              />
+            </div>
+          </div>
+
           {/* Result & P&L */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
@@ -286,10 +365,10 @@ const LogTradeModal: React.FC<LogTradeModalProps> = ({
           </Button>
           <Button
             onClick={handleSubmit}
-            disabled={createTrade.isPending}
+            disabled={saveTrade.isPending}
             className="bg-primary text-primary-foreground hover:bg-primary/90"
           >
-            Log Trade
+            {editTrade ? "Save Changes" : "Log Trade"}
           </Button>
         </div>
       </DialogContent>
