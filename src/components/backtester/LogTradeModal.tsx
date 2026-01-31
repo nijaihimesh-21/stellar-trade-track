@@ -11,6 +11,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -35,6 +36,7 @@ interface Trade {
   risk_reward: number | null;
   lots: number | null;
   pips: number | null;
+  notes: string | null;
 }
 
 interface LogTradeModalProps {
@@ -71,6 +73,7 @@ const LogTradeModal: React.FC<LogTradeModalProps> = ({
     pnl: "",
     lots: "",
     pips: "",
+    notes: "",
   });
 
   const [formData, setFormData] = useState(getInitialFormData());
@@ -91,6 +94,7 @@ const LogTradeModal: React.FC<LogTradeModalProps> = ({
         pnl: editTrade.pnl?.toString() || "",
         lots: editTrade.lots?.toString() || "",
         pips: editTrade.pips?.toString() || "",
+        notes: editTrade.notes || "",
       });
     } else {
       setFormData(getInitialFormData());
@@ -129,6 +133,7 @@ const LogTradeModal: React.FC<LogTradeModalProps> = ({
         risk_reward: riskReward,
         lots,
         pips,
+        notes: formData.notes || null,
       };
 
       if (editTrade) {
@@ -352,6 +357,19 @@ const LogTradeModal: React.FC<LogTradeModalProps> = ({
                 className="bg-background border-border focus:border-primary focus:ring-primary/20"
               />
             </div>
+          </div>
+
+          {/* Notes */}
+          <div className="space-y-2">
+            <Label className="text-foreground">
+              Notes <span className="text-muted-foreground">(optional)</span>
+            </Label>
+            <Textarea
+              placeholder="Add any notes about this trade..."
+              value={formData.notes}
+              onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+              className="bg-background border-border focus:border-primary focus:ring-primary/20 min-h-[80px]"
+            />
           </div>
         </div>
 

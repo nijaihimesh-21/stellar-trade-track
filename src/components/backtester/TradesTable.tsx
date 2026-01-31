@@ -29,6 +29,7 @@ interface Trade {
   risk_reward: number | null;
   lots: number | null;
   pips: number | null;
+  notes: string | null;
 }
 
 interface TradesTableProps {

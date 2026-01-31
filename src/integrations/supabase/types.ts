@@ -78,6 +78,7 @@ export type Database = {
           entry_price: number
           id: string
           lots: number | null
+          notes: string | null
           pair: string
           pips: number | null
           pnl: number | null
@@ -98,6 +99,7 @@ export type Database = {
           entry_price: number
           id?: string
           lots?: number | null
+          notes?: string | null
           pair: string
           pips?: number | null
           pnl?: number | null
@@ -118,6 +120,7 @@ export type Database = {
           entry_price?: number
           id?: string
           lots?: number | null
+          notes?: string | null
           pair?: string
           pips?: number | null
           pnl?: number | null
