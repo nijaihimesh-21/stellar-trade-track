@@ -36,6 +36,8 @@ interface Trade {
   lots: number | null;
   pips: number | null;
   notes: string | null;
+  sl_pips: number | null;
+  tp_pips: number | null;
 }
 
 interface TradesTableProps {
@@ -110,7 +112,9 @@ const TradesTable: React.FC<TradesTableProps> = ({
                 <TableHead className="text-muted-foreground">Session</TableHead>
                 <TableHead className="text-muted-foreground">Entry</TableHead>
                 <TableHead className="text-muted-foreground">SL</TableHead>
+                <TableHead className="text-muted-foreground">SL Pips</TableHead>
                 <TableHead className="text-muted-foreground">TP</TableHead>
+                <TableHead className="text-muted-foreground">TP Pips</TableHead>
                 <TableHead className="text-muted-foreground">Lots</TableHead>
                 <TableHead className="text-muted-foreground">Pips</TableHead>
                 <TableHead className="text-muted-foreground">R:R</TableHead>
@@ -141,7 +145,9 @@ const TradesTable: React.FC<TradesTableProps> = ({
                   <TableCell className="text-muted-foreground">{trade.session}</TableCell>
                   <TableCell className="text-foreground">{trade.entry_price}</TableCell>
                   <TableCell className="text-muted-foreground">{trade.stop_loss || "—"}</TableCell>
+                  <TableCell className="text-muted-foreground">{trade.sl_pips || "—"}</TableCell>
                   <TableCell className="text-muted-foreground">{trade.take_profit || "—"}</TableCell>
+                  <TableCell className="text-muted-foreground">{trade.tp_pips || "—"}</TableCell>
                   <TableCell className="text-muted-foreground">{trade.lots || "—"}</TableCell>
                   <TableCell className="text-muted-foreground">{trade.pips || "—"}</TableCell>
                   <TableCell className="text-muted-foreground">

@@ -40,6 +40,8 @@ interface StrategyTrade {
   lots: number | null;
   pips: number | null;
   notes: string | null;
+  sl_pips: number | null;
+  tp_pips: number | null;
 }
 
 interface Strategy {
