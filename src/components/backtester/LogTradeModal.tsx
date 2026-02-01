@@ -37,6 +37,8 @@ interface Trade {
   lots: number | null;
   pips: number | null;
   notes: string | null;
+  sl_pips: number | null;
+  tp_pips: number | null;
 }
 
 interface LogTradeModalProps {
@@ -74,6 +76,8 @@ const LogTradeModal: React.FC<LogTradeModalProps> = ({
     lots: "",
     pips: "",
     notes: "",
+    sl_pips: "",
+    tp_pips: "",
   });
 
   const [formData, setFormData] = useState(getInitialFormData());
@@ -95,6 +99,8 @@ const LogTradeModal: React.FC<LogTradeModalProps> = ({
         lots: editTrade.lots?.toString() || "",
         pips: editTrade.pips?.toString() || "",
         notes: editTrade.notes || "",
+        sl_pips: editTrade.sl_pips?.toString() || "",
+        tp_pips: editTrade.tp_pips?.toString() || "",
       });
     } else {
       setFormData(getInitialFormData());
@@ -108,6 +114,8 @@ const LogTradeModal: React.FC<LogTradeModalProps> = ({
       const tp = formData.take_profit ? parseFloat(formData.take_profit) : null;
       const lots = formData.lots ? parseFloat(formData.lots) : null;
       const pips = formData.pips ? parseFloat(formData.pips) : null;
+      const slPips = formData.sl_pips ? parseFloat(formData.sl_pips) : null;
+      const tpPips = formData.tp_pips ? parseFloat(formData.tp_pips) : null;
       
       // Calculate R:R
       let riskReward = null;
@@ -134,6 +142,8 @@ const LogTradeModal: React.FC<LogTradeModalProps> = ({
         lots,
         pips,
         notes: formData.notes || null,
+        sl_pips: slPips,
+        tp_pips: tpPips,
       };
 
       if (editTrade) {
@@ -259,21 +269,23 @@ const LogTradeModal: React.FC<LogTradeModalProps> = ({
             </div>
           </div>
 
-          {/* Entry, SL, TP */}
-          <div className="grid grid-cols-3 gap-4">
+          {/* Entry Price */}
+          <div className="space-y-2">
+            <Label className="text-foreground">Entry Price</Label>
+            <Input
+              type="number"
+              step="0.00001"
+              placeholder="1.0850"
+              value={formData.entry_price}
+              onChange={(e) => setFormData({ ...formData, entry_price: e.target.value })}
+              className="bg-background border-border focus:border-primary focus:ring-primary/20"
+            />
+          </div>
+
+          {/* SL Price & SL Pips */}
+          <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label className="text-foreground">Entry</Label>
-              <Input
-                type="number"
-                step="0.00001"
-                placeholder="1.0850"
-                value={formData.entry_price}
-                onChange={(e) => setFormData({ ...formData, entry_price: e.target.value })}
-                className="bg-background border-border focus:border-primary focus:ring-primary/20"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label className="text-foreground">Stop Loss</Label>
+              <Label className="text-foreground">Stop Loss Price</Label>
               <Input
                 type="number"
                 step="0.00001"
@@ -284,13 +296,43 @@ const LogTradeModal: React.FC<LogTradeModalProps> = ({
               />
             </div>
             <div className="space-y-2">
-              <Label className="text-foreground">Take Profit</Label>
+              <Label className="text-foreground">
+                SL in Pips <span className="text-muted-foreground">(optional)</span>
+              </Label>
+              <Input
+                type="number"
+                step="0.1"
+                placeholder="30"
+                value={formData.sl_pips}
+                onChange={(e) => setFormData({ ...formData, sl_pips: e.target.value })}
+                className="bg-background border-border focus:border-primary focus:ring-primary/20"
+              />
+            </div>
+          </div>
+
+          {/* TP Price & TP Pips */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label className="text-foreground">Take Profit Price</Label>
               <Input
                 type="number"
                 step="0.00001"
                 placeholder="1.0920"
                 value={formData.take_profit}
                 onChange={(e) => setFormData({ ...formData, take_profit: e.target.value })}
+                className="bg-background border-border focus:border-primary focus:ring-primary/20"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label className="text-foreground">
+                TP in Pips <span className="text-muted-foreground">(optional)</span>
+              </Label>
+              <Input
+                type="number"
+                step="0.1"
+                placeholder="60"
+                value={formData.tp_pips}
+                onChange={(e) => setFormData({ ...formData, tp_pips: e.target.value })}
                 className="bg-background border-border focus:border-primary focus:ring-primary/20"
               />
             </div>

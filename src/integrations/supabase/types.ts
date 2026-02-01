@@ -85,9 +85,11 @@ export type Database = {
           result: string
           risk_reward: number | null
           session: string
+          sl_pips: number | null
           stop_loss: number | null
           strategy_id: string
           take_profit: number | null
+          tp_pips: number | null
           trade_date: string
           trade_time: string
           updated_at: string
@@ -106,9 +108,11 @@ export type Database = {
           result: string
           risk_reward?: number | null
           session: string
+          sl_pips?: number | null
           stop_loss?: number | null
           strategy_id: string
           take_profit?: number | null
+          tp_pips?: number | null
           trade_date: string
           trade_time: string
           updated_at?: string
@@ -127,9 +131,11 @@ export type Database = {
           result?: string
           risk_reward?: number | null
           session?: string
+          sl_pips?: number | null
           stop_loss?: number | null
           strategy_id?: string
           take_profit?: number | null
+          tp_pips?: number | null
           trade_date?: string
           trade_time?: string
           updated_at?: string
