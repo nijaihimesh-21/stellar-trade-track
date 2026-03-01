@@ -211,15 +211,14 @@ const Analytics = () => {
       </div>
 
       {/* Trade Form Modal */}
-      {showTradeForm && (
-        <TradeForm
-          onClose={() => setShowTradeForm(false)}
-          onSuccess={() => {
-            setShowTradeForm(false);
-            fetchTrades();
-          }}
-        />
-      )}
+      <TradeForm
+        open={showTradeForm}
+        onOpenChange={(open) => setShowTradeForm(open)}
+        onSuccess={() => {
+          setShowTradeForm(false);
+          fetchTrades();
+        }}
+      />
     </div>
   );
 };
