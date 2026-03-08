@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { ChevronLeft, TrendingUp, BarChart2, Calendar, Pencil, Trash2, MessageSquare } from "lucide-react";
+import BalanceHeader from "@/components/BalanceHeader";
 import { cn } from "@/lib/utils";
 import { format, parseISO } from "date-fns";
 import { Button } from "@/components/ui/button";
@@ -252,6 +253,12 @@ const TradeLog = () => {
         {/* Day View */}
         {viewLevel === "day" && selectedYear !== null && selectedMonth !== null && (
           <div className="space-y-6">
+            <BalanceHeader
+              year={selectedYear}
+              month={selectedMonth}
+              monthPnl={getDaysForMonth(selectedYear, selectedMonth).reduce((sum, d) => sum + d.pnl, 0)}
+              monthName={monthNames[selectedMonth]}
+            />
             {getDaysForMonth(selectedYear, selectedMonth).map(({ date, trades: dayTrades, pnl }) => (
               <div key={date} className="stat-card">
                 <div className="flex items-center justify-between mb-4">
