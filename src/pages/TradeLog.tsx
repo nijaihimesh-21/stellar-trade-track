@@ -343,12 +343,14 @@ const TradeLog = () => {
                             <span
                               className={cn(
                                 "px-2 py-1 rounded text-xs font-medium",
-                                trade.outcome >= 0
+                                trade.outcome > 0
                                   ? "bg-profit/20 text-profit"
+                                  : trade.outcome === 0
+                                  ? "bg-secondary text-muted-foreground"
                                   : "bg-loss/20 text-loss"
                               )}
                             >
-                              {trade.outcome >= 0 ? "WIN" : "LOSS"}
+                              {trade.outcome > 0 ? "WIN" : trade.outcome === 0 ? "BE" : "LOSS"}
                             </span>
                           </td>
                           <td className="py-3 px-2">
