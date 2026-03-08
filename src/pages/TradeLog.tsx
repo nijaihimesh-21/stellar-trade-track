@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { ChevronLeft, TrendingUp, BarChart2, Calendar, Pencil, Trash2, MessageSquare } from "lucide-react";
+import BalanceHeader from "@/components/BalanceHeader";
 import { cn } from "@/lib/utils";
 import { format, parseISO } from "date-fns";
 import { Button } from "@/components/ui/button";
