@@ -253,6 +253,12 @@ const TradeLog = () => {
         {/* Day View */}
         {viewLevel === "day" && selectedYear !== null && selectedMonth !== null && (
           <div className="space-y-6">
+            <BalanceHeader
+              year={selectedYear}
+              month={selectedMonth}
+              monthPnl={getDaysForMonth(selectedYear, selectedMonth).reduce((sum, d) => sum + d.pnl, 0)}
+              monthName={monthNames[selectedMonth]}
+            />
             {getDaysForMonth(selectedYear, selectedMonth).map(({ date, trades: dayTrades, pnl }) => (
               <div key={date} className="stat-card">
                 <div className="flex items-center justify-between mb-4">
