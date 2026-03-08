@@ -326,11 +326,8 @@ const TradeLog = () => {
                           </td>
                           <td className="py-3 px-2 text-muted-foreground">{trade.session || "—"}</td>
                           <td className="py-3 px-2 text-foreground">{trade.entry_price}</td>
-                          <td className="py-3 px-2 text-muted-foreground">{trade.stop_loss ?? "—"}</td>
-                          <td className="py-3 px-2 text-muted-foreground">{trade.sl_pips ?? "—"}</td>
-                          <td className="py-3 px-2 text-muted-foreground">{trade.take_profit ?? "—"}</td>
-                          <td className="py-3 px-2 text-muted-foreground">{trade.tp_pips ?? "—"}</td>
-                          <td className="py-3 px-2 text-foreground">{trade.exit_price ?? "—"}</td>
+                           <td className="py-3 px-2 text-muted-foreground">{trade.stop_loss ?? "—"}</td>
+                           <td className="py-3 px-2 text-muted-foreground">{trade.take_profit ?? "—"}</td>
                           <td className="py-3 px-2 text-foreground">{trade.position_size}</td>
                           <td className="py-3 px-2 text-foreground">{trade.risk_reward ?? "—"}</td>
                           <td
