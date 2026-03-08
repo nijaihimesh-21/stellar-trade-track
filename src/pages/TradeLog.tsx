@@ -294,11 +294,8 @@ const TradeLog = () => {
                         <th className="text-left text-xs text-muted-foreground uppercase py-3 px-2">Side</th>
                         <th className="text-left text-xs text-muted-foreground uppercase py-3 px-2">Session</th>
                         <th className="text-left text-xs text-muted-foreground uppercase py-3 px-2">Entry</th>
-                        <th className="text-left text-xs text-muted-foreground uppercase py-3 px-2">SL</th>
-                        <th className="text-left text-xs text-muted-foreground uppercase py-3 px-2">SL Pips</th>
-                        <th className="text-left text-xs text-muted-foreground uppercase py-3 px-2">TP</th>
-                        <th className="text-left text-xs text-muted-foreground uppercase py-3 px-2">TP Pips</th>
-                        <th className="text-left text-xs text-muted-foreground uppercase py-3 px-2">Exit</th>
+                         <th className="text-left text-xs text-muted-foreground uppercase py-3 px-2">SL</th>
+                         <th className="text-left text-xs text-muted-foreground uppercase py-3 px-2">TP</th>
                         <th className="text-left text-xs text-muted-foreground uppercase py-3 px-2">Lot</th>
                         <th className="text-left text-xs text-muted-foreground uppercase py-3 px-2">R:R</th>
                         <th className="text-left text-xs text-muted-foreground uppercase py-3 px-2">P&L</th>
