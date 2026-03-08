@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      monthly_balances: {
+        Row: {
+          created_at: string
+          id: string
+          is_global: boolean
+          month: number
+          starting_balance: number
+          updated_at: string
+          user_id: string
+          year: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_global?: boolean
+          month: number
+          starting_balance?: number
+          updated_at?: string
+          user_id: string
+          year: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_global?: boolean
+          month?: number
+          starting_balance?: number
+          updated_at?: string
+          user_id?: string
+          year?: number
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
