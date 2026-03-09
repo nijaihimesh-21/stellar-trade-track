@@ -1,0 +1,1 @@
+ALTER TABLE public.monthly_balances ADD COLUMN broker_charges numeric NOT NULL DEFAULT 0;

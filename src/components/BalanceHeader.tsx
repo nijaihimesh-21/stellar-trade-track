@@ -21,6 +21,9 @@ const BalanceHeader = ({ year, month, monthPnl, monthName }: BalanceHeaderProps)
   const [inputValue, setInputValue] = useState("");
   const [isGlobal, setIsGlobal] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [brokerCharges, setBrokerCharges] = useState<number>(0);
+  const [isEditingCharges, setIsEditingCharges] = useState(false);
+  const [chargesInput, setChargesInput] = useState("");
 
   useEffect(() => {
     fetchBalance();
@@ -42,6 +45,7 @@ const BalanceHeader = ({ year, month, monthPnl, monthName }: BalanceHeaderProps)
 
     if (monthData) {
       setStartingBalance(Number(monthData.starting_balance));
+      setBrokerCharges(Number(monthData.broker_charges ?? 0));
       setIsGlobal(false);
       setLoading(false);
       return;
@@ -56,12 +60,12 @@ const BalanceHeader = ({ year, month, monthPnl, monthName }: BalanceHeaderProps)
       .maybeSingle();
 
     if (globalData) {
-      // Calculate carry-forward: global balance + all P&L from months before this one
       setStartingBalance(Number(globalData.starting_balance));
       setIsGlobal(true);
     } else {
       setStartingBalance(null);
     }
+    setBrokerCharges(0);
     setLoading(false);
   };
 
@@ -82,6 +86,7 @@ const BalanceHeader = ({ year, month, monthPnl, monthName }: BalanceHeaderProps)
           month,
           starting_balance: value,
           is_global: false,
+          broker_charges: brokerCharges,
         },
         { onConflict: "user_id,year,month" }
       );
@@ -127,7 +132,42 @@ const BalanceHeader = ({ year, month, monthPnl, monthName }: BalanceHeaderProps)
     }
   };
 
-  const currentBalance = startingBalance !== null ? startingBalance + monthPnl : null;
+  const saveBrokerCharges = async () => {
+    if (!user) return;
+    const value = parseFloat(chargesInput);
+    if (isNaN(value) || value < 0) {
+      toast.error("Please enter a valid number");
+      return;
+    }
+
+    // Upsert the monthly record with broker charges
+    const { error } = await supabase
+      .from("monthly_balances")
+      .upsert(
+        {
+          user_id: user.id,
+          year,
+          month,
+          starting_balance: startingBalance ?? 0,
+          is_global: false,
+          broker_charges: value,
+        },
+        { onConflict: "user_id,year,month" }
+      );
+
+    if (error) {
+      toast.error("Failed to save broker charges");
+    } else {
+      setBrokerCharges(value);
+      setIsEditingCharges(false);
+      if (isGlobal && startingBalance !== null) {
+        setIsGlobal(false);
+      }
+      toast.success("Broker charges saved");
+    }
+  };
+
+  const currentBalance = startingBalance !== null ? startingBalance + monthPnl - brokerCharges : null;
 
   if (loading) return null;
 
@@ -200,6 +240,52 @@ const BalanceHeader = ({ year, month, monthPnl, monthName }: BalanceHeaderProps)
             )}
           </div>
         </div>
+
+        {/* Broker Charges */}
+        {startingBalance !== null && (
+          <div className="text-center">
+            <p className="text-xs text-muted-foreground uppercase tracking-wide">Broker Charges</p>
+            {isEditingCharges ? (
+              <div className="flex items-center gap-1 mt-1">
+                <Input
+                  type="number"
+                  value={chargesInput}
+                  onChange={(e) => setChargesInput(e.target.value)}
+                  placeholder="0"
+                  className="h-8 w-28 bg-background text-center"
+                  autoFocus
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") saveBrokerCharges();
+                    if (e.key === "Escape") setIsEditingCharges(false);
+                  }}
+                />
+                <Button size="icon" variant="ghost" className="h-8 w-8 text-profit hover:text-profit" onClick={saveBrokerCharges}>
+                  <Check className="w-4 h-4" />
+                </Button>
+                <Button size="icon" variant="ghost" className="h-8 w-8 text-muted-foreground" onClick={() => setIsEditingCharges(false)}>
+                  <X className="w-4 h-4" />
+                </Button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-1 justify-center">
+                <span className={cn("text-lg font-bold", brokerCharges > 0 ? "text-loss" : "text-muted-foreground")}>
+                  {brokerCharges > 0 ? `-$${brokerCharges.toLocaleString()}` : "$0"}
+                </span>
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="h-6 w-6 text-muted-foreground hover:text-primary"
+                  onClick={() => {
+                    setChargesInput(brokerCharges.toString());
+                    setIsEditingCharges(true);
+                  }}
+                >
+                  <Pencil className="w-3 h-3" />
+                </Button>
+              </div>
+            )}
+          </div>
+        )}
 
         {startingBalance !== null && (
           <div className="text-right">
