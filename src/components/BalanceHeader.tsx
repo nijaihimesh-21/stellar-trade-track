@@ -241,6 +241,52 @@ const BalanceHeader = ({ year, month, monthPnl, monthName }: BalanceHeaderProps)
           </div>
         </div>
 
+        {/* Broker Charges */}
+        {startingBalance !== null && (
+          <div className="text-center">
+            <p className="text-xs text-muted-foreground uppercase tracking-wide">Broker Charges</p>
+            {isEditingCharges ? (
+              <div className="flex items-center gap-1 mt-1">
+                <Input
+                  type="number"
+                  value={chargesInput}
+                  onChange={(e) => setChargesInput(e.target.value)}
+                  placeholder="0"
+                  className="h-8 w-28 bg-background text-center"
+                  autoFocus
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") saveBrokerCharges();
+                    if (e.key === "Escape") setIsEditingCharges(false);
+                  }}
+                />
+                <Button size="icon" variant="ghost" className="h-8 w-8 text-profit hover:text-profit" onClick={saveBrokerCharges}>
+                  <Check className="w-4 h-4" />
+                </Button>
+                <Button size="icon" variant="ghost" className="h-8 w-8 text-muted-foreground" onClick={() => setIsEditingCharges(false)}>
+                  <X className="w-4 h-4" />
+                </Button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-1 justify-center">
+                <span className={cn("text-lg font-bold", brokerCharges > 0 ? "text-loss" : "text-muted-foreground")}>
+                  {brokerCharges > 0 ? `-$${brokerCharges.toLocaleString()}` : "$0"}
+                </span>
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="h-6 w-6 text-muted-foreground hover:text-primary"
+                  onClick={() => {
+                    setChargesInput(brokerCharges.toString());
+                    setIsEditingCharges(true);
+                  }}
+                >
+                  <Pencil className="w-3 h-3" />
+                </Button>
+              </div>
+            )}
+          </div>
+        )}
+
         {startingBalance !== null && (
           <div className="text-right">
             <p className="text-xs text-muted-foreground uppercase tracking-wide">Current Balance</p>
