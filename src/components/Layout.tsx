@@ -10,6 +10,7 @@ import {
   X,
   ShieldCheck,
   FlaskConical,
+  Brain,
   Layers,
   LineChart,
   Cog,
@@ -34,6 +35,7 @@ interface LayoutProps {
 const navItems = [
   { icon: BarChart3, label: "Overall Analytics", path: "/" },
   { icon: BookOpen, label: "Trade Log", path: "/trade-log" },
+  { icon: Brain, label: "Psychology", path: "/psychology" },
   { icon: ShieldCheck, label: "Strategy Health", path: "/strategy-health" },
 ];
 
