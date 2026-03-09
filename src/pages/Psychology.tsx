@@ -4,6 +4,9 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Brain, Plus, Pencil, Trash2, Calendar, Star, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { format, startOfWeek, endOfWeek, startOfMonth, endOfMonth, parseISO } from "date-fns";
+import { CalendarIcon } from "lucide-react";
+import { Calendar as CalendarComponent } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -361,22 +364,56 @@ const Psychology = () => {
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <Label className="text-muted-foreground">Start Date</Label>
-                <Input
-                  type="date"
-                  value={periodStart}
-                  onChange={(e) => handleStartDateChange(e.target.value)}
-                  className="bg-secondary border-border text-foreground"
-                />
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        "w-full justify-start text-left font-normal bg-secondary border-border",
+                        !periodStart && "text-muted-foreground"
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {periodStart ? format(parseISO(periodStart), "PPP") : "Pick a date"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <CalendarComponent
+                      mode="single"
+                      selected={periodStart ? parseISO(periodStart) : undefined}
+                      onSelect={(date) => date && handleStartDateChange(format(date, "yyyy-MM-dd"))}
+                      initialFocus
+                      className={cn("p-3 pointer-events-auto")}
+                    />
+                  </PopoverContent>
+                </Popover>
               </div>
               <div>
                 <Label className="text-muted-foreground">End Date</Label>
-                <Input
-                  type="date"
-                  value={periodEnd}
-                  onChange={(e) => setPeriodEnd(e.target.value)}
-                  className="bg-secondary border-border text-foreground"
-                  disabled={periodType !== "custom"}
-                />
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        "w-full justify-start text-left font-normal bg-secondary border-border",
+                        !periodEnd && "text-muted-foreground"
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {periodEnd ? format(parseISO(periodEnd), "PPP") : "Pick a date"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <CalendarComponent
+                      mode="single"
+                      selected={periodEnd ? parseISO(periodEnd) : undefined}
+                      onSelect={(date) => date && setPeriodEnd(format(date, "yyyy-MM-dd"))}
+                      disabled={periodType !== "custom"}
+                      initialFocus
+                      className={cn("p-3 pointer-events-auto")}
+                    />
+                  </PopoverContent>
+                </Popover>
               </div>
             </div>
 
