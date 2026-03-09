@@ -494,6 +494,17 @@ const Psychology = () => {
             </div>
 
             <div>
+              <Label className="text-muted-foreground">Final Conclusion</Label>
+              <Textarea
+                value={conclusion}
+                onChange={(e) => setConclusion(e.target.value)}
+                placeholder="Summarize your key takeaways and how you'll apply them..."
+                className="bg-secondary border-border text-foreground"
+                rows={2}
+              />
+            </div>
+
+            <div>
               <Label className="text-muted-foreground">Overall Rating</Label>
               <div className="flex items-center gap-1 mt-1">
                 {Array.from({ length: 5 }, (_, i) => (
