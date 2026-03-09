@@ -76,6 +76,7 @@ export type Database = {
       }
       psychology_entries: {
         Row: {
+          conclusion: string | null
           created_at: string
           emotions: string | null
           id: string
@@ -92,6 +93,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          conclusion?: string | null
           created_at?: string
           emotions?: string | null
           id?: string
@@ -108,6 +110,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          conclusion?: string | null
           created_at?: string
           emotions?: string | null
           id?: string

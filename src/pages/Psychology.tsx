@@ -33,6 +33,7 @@ interface PsychologyEntry {
   lessons_learned: string | null;
   improvements: string | null;
   notes: string | null;
+  conclusion: string | null;
   rating: number | null;
   created_at: string;
 }
@@ -54,6 +55,7 @@ const Psychology = () => {
   const [lessonsLearned, setLessonsLearned] = useState("");
   const [improvements, setImprovements] = useState("");
   const [notes, setNotes] = useState("");
+  const [conclusion, setConclusion] = useState("");
   const [rating, setRating] = useState<number>(3);
 
   const fetchEntries = useCallback(async () => {
@@ -80,6 +82,7 @@ const Psychology = () => {
     setLessonsLearned("");
     setImprovements("");
     setNotes("");
+    setConclusion("");
     setRating(3);
     setEditEntry(null);
   };
@@ -125,6 +128,7 @@ const Psychology = () => {
     setLessonsLearned(entry.lessons_learned || "");
     setImprovements(entry.improvements || "");
     setNotes(entry.notes || "");
+    setConclusion(entry.conclusion || "");
     setRating(entry.rating || 3);
     setDialogOpen(true);
   };
@@ -146,6 +150,7 @@ const Psychology = () => {
       lessons_learned: lessonsLearned || null,
       improvements: improvements || null,
       notes: notes || null,
+      conclusion: conclusion || null,
       rating,
     };
 
@@ -326,6 +331,12 @@ const Psychology = () => {
                 <p className="text-sm text-foreground whitespace-pre-wrap">{entry.notes}</p>
               </div>
             )}
+            {entry.conclusion && (
+              <div className="mt-4 pt-3 border-t border-border">
+                <p className="text-xs text-muted-foreground uppercase mb-1">Conclusion</p>
+                <p className="text-sm text-foreground whitespace-pre-wrap">{entry.conclusion}</p>
+              </div>
+            )}
           </div>
         ))}
         {filtered.length === 0 && (
@@ -477,6 +488,17 @@ const Psychology = () => {
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 placeholder="Any other thoughts..."
+                className="bg-secondary border-border text-foreground"
+                rows={2}
+              />
+            </div>
+
+            <div>
+              <Label className="text-muted-foreground">Final Conclusion</Label>
+              <Textarea
+                value={conclusion}
+                onChange={(e) => setConclusion(e.target.value)}
+                placeholder="Summarize your key takeaways and how you'll apply them..."
                 className="bg-secondary border-border text-foreground"
                 rows={2}
               />
