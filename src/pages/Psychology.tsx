@@ -33,6 +33,7 @@ interface PsychologyEntry {
   lessons_learned: string | null;
   improvements: string | null;
   notes: string | null;
+  conclusion: string | null;
   rating: number | null;
   created_at: string;
 }
