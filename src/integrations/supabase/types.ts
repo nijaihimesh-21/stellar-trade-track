@@ -16,6 +16,7 @@ export type Database = {
     Tables: {
       monthly_balances: {
         Row: {
+          broker_charges: number
           created_at: string
           id: string
           is_global: boolean
@@ -26,6 +27,7 @@ export type Database = {
           year: number
         }
         Insert: {
+          broker_charges?: number
           created_at?: string
           id?: string
           is_global?: boolean
@@ -36,6 +38,7 @@ export type Database = {
           year: number
         }
         Update: {
+          broker_charges?: number
           created_at?: string
           id?: string
           is_global?: boolean
