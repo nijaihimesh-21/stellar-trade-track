@@ -82,6 +82,7 @@ const Psychology = () => {
     setLessonsLearned("");
     setImprovements("");
     setNotes("");
+    setConclusion("");
     setRating(3);
     setEditEntry(null);
   };
