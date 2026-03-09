@@ -12,6 +12,7 @@ import Analytics from "@/pages/Analytics";
 import TradeLog from "@/pages/TradeLog";
 import StrategyHealth from "@/pages/StrategyHealth";
 import Settings from "@/pages/Settings";
+import Psychology from "@/pages/Psychology";
 import NotFound from "@/pages/NotFound";
 import Strategies from "@/pages/backtester/Strategies";
 import StrategyDetail from "@/pages/backtester/StrategyDetail";
@@ -54,6 +55,16 @@ const App = () => (
                 <ProtectedRoute>
                   <Layout>
                     <TradeLog />
+                  </Layout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/psychology"
+              element={
+                <ProtectedRoute>
+                  <Layout>
+                    <Psychology />
                   </Layout>
                 </ProtectedRoute>
               }
