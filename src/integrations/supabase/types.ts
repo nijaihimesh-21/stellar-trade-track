@@ -74,6 +74,57 @@ export type Database = {
         }
         Relationships: []
       }
+      psychology_entries: {
+        Row: {
+          created_at: string
+          emotions: string | null
+          id: string
+          improvements: string | null
+          lessons_learned: string | null
+          mental_state: string | null
+          notes: string | null
+          period_end: string
+          period_start: string
+          period_type: string
+          rating: number | null
+          title: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          emotions?: string | null
+          id?: string
+          improvements?: string | null
+          lessons_learned?: string | null
+          mental_state?: string | null
+          notes?: string | null
+          period_end: string
+          period_start: string
+          period_type?: string
+          rating?: number | null
+          title?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          emotions?: string | null
+          id?: string
+          improvements?: string | null
+          lessons_learned?: string | null
+          mental_state?: string | null
+          notes?: string | null
+          period_end?: string
+          period_start?: string
+          period_type?: string
+          rating?: number | null
+          title?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       strategies: {
         Row: {
           created_at: string
