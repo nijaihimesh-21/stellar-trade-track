@@ -170,7 +170,7 @@ const Analytics = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="stat-card">
           <p className="text-muted-foreground text-sm mb-4">Best Pairs</p>
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {bestPairs.length > 0 ? (
               bestPairs.map(([pair, stats]) => (
                 <div key={pair} className="bg-secondary rounded-lg p-4">
