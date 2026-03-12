@@ -78,16 +78,20 @@ const Settings = () => {
               {
                 value: "calendar" as TimeWindowType,
                 title: "Calendar-based",
-                desc: period === "weekly"
-                  ? "Monday → Sunday of the current week"
-                  : "1st → last day of the current month",
+                desc: period === "daily"
+                  ? "Today only"
+                  : period === "weekly"
+                    ? "Monday → Sunday of the current week"
+                    : "1st → last day of the current month",
               },
               {
                 value: "rolling" as TimeWindowType,
                 title: "Rolling",
-                desc: period === "weekly"
-                  ? "Last 7 days from today"
-                  : "Last 30 days from today",
+                desc: period === "daily"
+                  ? "Today only"
+                  : period === "weekly"
+                    ? "Last 7 days from today"
+                    : "Last 30 days from today",
               },
             ]).map((opt) => (
               <button
