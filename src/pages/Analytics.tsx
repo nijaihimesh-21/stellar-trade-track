@@ -77,32 +77,20 @@ const Analytics = () => {
     <div className="space-y-6 animate-fade-in">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <div />
-        <div className="flex items-center gap-3">
-          <div className="flex bg-secondary rounded-lg p-1">
-            {(["daily", "weekly", "monthly"] as FilterType[]).map((f) => (
-              <button
-                key={f}
-                onClick={() => setFilter(f)}
-                className={cn(
-                  "px-4 py-2 rounded-md text-sm font-medium transition-all capitalize",
-                  filter === f
-                    ? "bg-card text-foreground"
-                    : "text-muted-foreground hover:text-foreground"
-                )}
-              >
-                {f}
-              </button>
-            ))}
-          </div>
-          <Button
-            onClick={() => setShowTradeForm(true)}
-            className="bg-card border border-border hover:bg-secondary text-foreground"
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            Add
-          </Button>
+        <div className="text-sm text-muted-foreground">
+          <span className="capitalize font-medium text-foreground">{period}</span>
+          {" · "}
+          {type === "calendar" ? "Calendar" : "Rolling"}
+          {" · "}
+          {dates.start} → {dates.end}
         </div>
+        <Button
+          onClick={() => setShowTradeForm(true)}
+          className="bg-card border border-border hover:bg-secondary text-foreground"
+        >
+          <Plus className="w-4 h-4 mr-2" />
+          Add
+        </Button>
       </div>
 
       {/* Stats Cards */}
