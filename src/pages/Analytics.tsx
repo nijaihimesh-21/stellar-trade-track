@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Plus, TrendingUp, TrendingDown } from "lucide-react";
 import TradeForm from "@/components/TradeForm";
 import { cn } from "@/lib/utils";
+import { useTimeWindow } from "@/hooks/useTimeWindow";
 
 interface Trade {
   id: string;
@@ -14,12 +15,10 @@ interface Trade {
   trade_date: string;
 }
 
-type FilterType = "daily" | "weekly" | "monthly";
-
 const Analytics = () => {
   const { user } = useAuth();
+  const { period, type, dates } = useTimeWindow();
   const [trades, setTrades] = useState<Trade[]>([]);
-  const [filter, setFilter] = useState<FilterType>("daily");
   const [showTradeForm, setShowTradeForm] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -27,21 +26,13 @@ const Analytics = () => {
     if (!user) return;
     
     setLoading(true);
-    let query = supabase.from("trades").select("*").eq("user_id", user.id);
-    
-    const now = new Date();
-    if (filter === "daily") {
-      const today = now.toISOString().split("T")[0];
-      query = query.eq("trade_date", today);
-    } else if (filter === "weekly") {
-      const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-      query = query.gte("trade_date", weekAgo.toISOString().split("T")[0]);
-    } else if (filter === "monthly") {
-      const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
-      query = query.gte("trade_date", monthAgo.toISOString().split("T")[0]);
-    }
-    
-    const { data, error } = await query;
+    const { data, error } = await supabase
+      .from("trades")
+      .select("*")
+      .eq("user_id", user.id)
+      .gte("trade_date", dates.start)
+      .lte("trade_date", dates.end);
+
     if (!error && data) {
       setTrades(data as Trade[]);
     }
@@ -50,7 +41,7 @@ const Analytics = () => {
 
   useEffect(() => {
     fetchTrades();
-  }, [user, filter]);
+  }, [user, period, type]);
 
   const totalPnL = trades.reduce((sum, t) => sum + Number(t.outcome), 0);
   const wins = trades.filter((t) => Number(t.outcome) > 0).length;
