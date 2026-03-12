@@ -17,7 +17,7 @@ interface Trade {
 
 const Analytics = () => {
   const { user } = useAuth();
-  const { period, type, dates } = useTimeWindow();
+  const { period, type, dates, setPeriod } = useTimeWindow();
   const [trades, setTrades] = useState<Trade[]>([]);
   const [showTradeForm, setShowTradeForm] = useState(false);
   const [loading, setLoading] = useState(true);
