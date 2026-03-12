@@ -8,7 +8,7 @@ import {
   format,
 } from "date-fns";
 
-export type TimeWindowPeriod = "weekly" | "monthly";
+export type TimeWindowPeriod = "daily" | "weekly" | "monthly";
 export type TimeWindowType = "calendar" | "rolling";
 
 export interface TimeWindowDates {
