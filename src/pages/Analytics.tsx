@@ -187,7 +187,7 @@ const Analytics = () => {
 
         <div className="stat-card">
           <p className="text-muted-foreground text-sm mb-4">Worst Pairs</p>
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {worstPairs.length > 0 ? (
               worstPairs.map(([pair, stats]) => (
                 <div key={pair} className="bg-secondary rounded-lg p-4">
