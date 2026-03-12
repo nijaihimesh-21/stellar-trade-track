@@ -261,7 +261,7 @@ const TradeLog = () => {
             />
             {getDaysForMonth(selectedYear, selectedMonth).map(({ date, trades: dayTrades, pnl }) => (
               <div key={date} className="stat-card">
-                <div className="flex items-center justify-between mb-4">
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mb-4">
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-12 bg-secondary rounded-lg flex items-center justify-center">
                       <span className="text-xl font-bold text-foreground">

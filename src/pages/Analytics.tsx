@@ -76,15 +76,15 @@ const Analytics = () => {
   return (
     <div className="space-y-6 animate-fade-in">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <div className="flex bg-secondary rounded-lg p-1">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
+          <div className="flex bg-secondary rounded-lg p-1 w-fit">
             {(["daily", "weekly", "monthly"] as TimeWindowPeriod[]).map((p) => (
               <button
                 key={p}
                 onClick={() => setPeriod(p)}
                 className={cn(
-                  "px-4 py-1.5 rounded-md text-sm font-medium transition-all capitalize",
+                  "px-3 sm:px-4 py-1.5 rounded-md text-xs sm:text-sm font-medium transition-all capitalize",
                   period === p
                     ? "bg-card text-foreground shadow-sm"
                     : "text-muted-foreground hover:text-foreground"
@@ -94,13 +94,13 @@ const Analytics = () => {
               </button>
             ))}
           </div>
-          <span className="text-xs text-muted-foreground">
+          <span className="text-xs text-muted-foreground truncate">
             {type === "calendar" ? "Calendar" : "Rolling"} · {dates.start} → {dates.end}
           </span>
         </div>
         <Button
           onClick={() => setShowTradeForm(true)}
-          className="bg-card border border-border hover:bg-secondary text-foreground"
+          className="bg-card border border-border hover:bg-secondary text-foreground w-fit"
         >
           <Plus className="w-4 h-4 mr-2" />
           Add
@@ -111,7 +111,7 @@ const Analytics = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="stat-card">
           <p className="text-muted-foreground text-sm mb-2">Profit & Loss</p>
-          <p className={cn("text-3xl font-bold", totalPnL >= 0 ? "text-profit" : "text-loss")}>
+         <p className={cn("text-2xl sm:text-3xl font-bold", totalPnL >= 0 ? "text-profit" : "text-loss")}>
             {totalPnL >= 0 ? "+" : ""} ${Math.abs(totalPnL).toLocaleString("en-US", { minimumFractionDigits: 2 })}
           </p>
           <div className="flex items-center gap-1 mt-2 text-sm">
@@ -170,7 +170,7 @@ const Analytics = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="stat-card">
           <p className="text-muted-foreground text-sm mb-4">Best Pairs</p>
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {bestPairs.length > 0 ? (
               bestPairs.map(([pair, stats]) => (
                 <div key={pair} className="bg-secondary rounded-lg p-4">
@@ -187,7 +187,7 @@ const Analytics = () => {
 
         <div className="stat-card">
           <p className="text-muted-foreground text-sm mb-4">Worst Pairs</p>
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {worstPairs.length > 0 ? (
               worstPairs.map(([pair, stats]) => (
                 <div key={pair} className="bg-secondary rounded-lg p-4">
