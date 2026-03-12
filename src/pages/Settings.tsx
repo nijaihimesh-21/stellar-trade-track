@@ -53,7 +53,7 @@ const Settings = () => {
         <div className="mb-5">
           <p className="text-sm font-medium text-foreground mb-2">Period</p>
           <div className="flex bg-secondary rounded-lg p-1">
-            {(["weekly", "monthly"] as TimeWindowPeriod[]).map((p) => (
+            {(["daily", "weekly", "monthly"] as TimeWindowPeriod[]).map((p) => (
               <button
                 key={p}
                 onClick={() => setPeriod(p)}
