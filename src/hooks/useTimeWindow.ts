@@ -8,7 +8,7 @@ import {
   format,
 } from "date-fns";
 
-export type TimeWindowPeriod = "weekly" | "monthly";
+export type TimeWindowPeriod = "daily" | "weekly" | "monthly";
 export type TimeWindowType = "calendar" | "rolling";
 
 export interface TimeWindowDates {
@@ -27,6 +27,9 @@ export function getTimeWindowDates(
   const fmt = (d: Date) => format(d, "yyyy-MM-dd");
 
   if (type === "calendar") {
+    if (period === "daily") {
+      return { start: fmt(now), end: fmt(now) };
+    }
     if (period === "weekly") {
       const start = startOfWeek(now, { weekStartsOn: 1 }); // Monday
       const end = endOfWeek(now, { weekStartsOn: 1 });     // Sunday
@@ -37,6 +40,9 @@ export function getTimeWindowDates(
   }
 
   // rolling
+  if (period === "daily") {
+    return { start: fmt(now), end: fmt(now) };
+  }
   if (period === "weekly") {
     return { start: fmt(subDays(now, 6)), end: fmt(now) };
   }

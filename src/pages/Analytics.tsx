@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Plus, TrendingUp, TrendingDown } from "lucide-react";
 import TradeForm from "@/components/TradeForm";
 import { cn } from "@/lib/utils";
-import { useTimeWindow } from "@/hooks/useTimeWindow";
+import { useTimeWindow, TimeWindowPeriod } from "@/hooks/useTimeWindow";
 
 interface Trade {
   id: string;
@@ -17,7 +17,7 @@ interface Trade {
 
 const Analytics = () => {
   const { user } = useAuth();
-  const { period, type, dates } = useTimeWindow();
+  const { period, type, dates, setPeriod } = useTimeWindow();
   const [trades, setTrades] = useState<Trade[]>([]);
   const [showTradeForm, setShowTradeForm] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -77,12 +77,26 @@ const Analytics = () => {
     <div className="space-y-6 animate-fade-in">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <div className="text-sm text-muted-foreground">
-          <span className="capitalize font-medium text-foreground">{period}</span>
-          {" · "}
-          {type === "calendar" ? "Calendar" : "Rolling"}
-          {" · "}
-          {dates.start} → {dates.end}
+        <div className="flex items-center gap-4">
+          <div className="flex bg-secondary rounded-lg p-1">
+            {(["daily", "weekly", "monthly"] as TimeWindowPeriod[]).map((p) => (
+              <button
+                key={p}
+                onClick={() => setPeriod(p)}
+                className={cn(
+                  "px-4 py-1.5 rounded-md text-sm font-medium transition-all capitalize",
+                  period === p
+                    ? "bg-card text-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                {p}
+              </button>
+            ))}
+          </div>
+          <span className="text-xs text-muted-foreground">
+            {type === "calendar" ? "Calendar" : "Rolling"} · {dates.start} → {dates.end}
+          </span>
         </div>
         <Button
           onClick={() => setShowTradeForm(true)}
