@@ -111,7 +111,7 @@ const Analytics = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="stat-card">
           <p className="text-muted-foreground text-sm mb-2">Profit & Loss</p>
-          <p className={cn("text-3xl font-bold", totalPnL >= 0 ? "text-profit" : "text-loss")}>
+         <p className={cn("text-2xl sm:text-3xl font-bold", totalPnL >= 0 ? "text-profit" : "text-loss")}>
             {totalPnL >= 0 ? "+" : ""} ${Math.abs(totalPnL).toLocaleString("en-US", { minimumFractionDigits: 2 })}
           </p>
           <div className="flex items-center gap-1 mt-2 text-sm">
