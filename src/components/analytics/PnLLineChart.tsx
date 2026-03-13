@@ -232,7 +232,7 @@ const PnLLineChart: React.FC<PnLLineChartProps> = ({ trades, period, dateRange }
   }, [trades, period, dateRange, startingBalance, brokerCharges, carriedForwardPnl]);
 
   const periodLabel =
-    period === "daily" ? "Hourly P&L" : period === "weekly" ? "Daily P&L" : "Monthly P&L";
+    period === "daily" ? "Hourly Account Balance" : period === "weekly" ? "Daily Account Balance" : "Monthly Account Balance";
 
   return (
     <div className="stat-card">
