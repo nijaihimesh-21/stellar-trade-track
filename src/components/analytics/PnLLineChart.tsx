@@ -8,7 +8,7 @@ import {
   CartesianGrid,
   Tooltip,
 } from "recharts";
-import { format, parseISO, eachDayOfInterval, eachHourOfDay } from "date-fns";
+import { format, parseISO, eachDayOfInterval } from "date-fns";
 import type { TimeWindowPeriod } from "@/hooks/useTimeWindow";
 
 interface Trade {
