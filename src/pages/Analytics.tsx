@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Plus, TrendingUp, TrendingDown } from "lucide-react";
 import TradeForm from "@/components/TradeForm";
 import { cn } from "@/lib/utils";
+import PnLLineChart from "@/components/analytics/PnLLineChart";
 import { useTimeWindow, TimeWindowPeriod } from "@/hooks/useTimeWindow";
 
 interface Trade {
@@ -13,6 +14,7 @@ interface Trade {
   outcome: number;
   session: string | null;
   trade_date: string;
+  trade_time: string;
 }
 
 const Analytics = () => {
@@ -202,6 +204,9 @@ const Analytics = () => {
           </div>
         </div>
       </div>
+
+      {/* P&L Line Chart */}
+      <PnLLineChart trades={trades} period={period} dateRange={dates} />
 
       {/* Trade Form Modal */}
       <TradeForm
