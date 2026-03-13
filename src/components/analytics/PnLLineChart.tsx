@@ -8,7 +8,7 @@ import {
   CartesianGrid,
   Tooltip,
 } from "recharts";
-import { format, parseISO, eachDayOfInterval } from "date-fns";
+import { format, parseISO, eachDayOfInterval, addDays, startOfMonth } from "date-fns";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import type { TimeWindowPeriod } from "@/hooks/useTimeWindow";
@@ -94,48 +94,92 @@ const CustomCursor = (props: any) => {
 const PnLLineChart: React.FC<PnLLineChartProps> = ({ trades, period, dateRange }) => {
   const { user } = useAuth();
   const [startingBalance, setStartingBalance] = useState<number>(0);
+  const [brokerCharges, setBrokerCharges] = useState<number>(0);
+  const [carriedForwardPnl, setCarriedForwardPnl] = useState<number>(0);
 
   useEffect(() => {
-    const fetchBalance = async () => {
+    const fetchBalanceContext = async () => {
       if (!user) return;
-      const now = parseISO(dateRange.start);
-      const year = now.getFullYear();
-      const month = now.getMonth() + 1;
 
-      // Try month-specific balance first
-      const { data: monthData } = await supabase
+      const startDate = parseISO(dateRange.start);
+      const year = startDate.getFullYear();
+      const monthZeroBased = startDate.getMonth();
+      const monthOneBased = startDate.getMonth() + 1;
+
+      // First try the same month indexing used in Trade Log (0-11)
+      const { data: monthDataZero } = await supabase
         .from("monthly_balances")
-        .select("starting_balance")
+        .select("starting_balance, broker_charges")
         .eq("user_id", user.id)
         .eq("year", year)
-        .eq("month", month)
+        .eq("month", monthZeroBased)
         .eq("is_global", false)
         .maybeSingle();
 
-      if (monthData) {
-        setStartingBalance(Number(monthData.starting_balance));
+      if (monthDataZero) {
+        setStartingBalance(Number(monthDataZero.starting_balance));
+        setBrokerCharges(Number(monthDataZero.broker_charges ?? 0));
+      } else {
+        // Backward-compatible fallback in case month was stored as 1-12
+        const { data: monthDataOne } = await supabase
+          .from("monthly_balances")
+          .select("starting_balance, broker_charges")
+          .eq("user_id", user.id)
+          .eq("year", year)
+          .eq("month", monthOneBased)
+          .eq("is_global", false)
+          .maybeSingle();
+
+        if (monthDataOne) {
+          setStartingBalance(Number(monthDataOne.starting_balance));
+          setBrokerCharges(Number(monthDataOne.broker_charges ?? 0));
+        } else {
+          // Fall back to global
+          const { data: globalData } = await supabase
+            .from("monthly_balances")
+            .select("starting_balance")
+            .eq("user_id", user.id)
+            .eq("is_global", true)
+            .maybeSingle();
+
+          if (globalData) {
+            setStartingBalance(Number(globalData.starting_balance));
+          } else {
+            setStartingBalance(0);
+          }
+          setBrokerCharges(0);
+        }
+      }
+
+      // Carry forward month-to-date P&L before the current visible range
+      const monthStart = format(startOfMonth(startDate), "yyyy-MM-dd");
+      const previousDay = format(addDays(startDate, -1), "yyyy-MM-dd");
+
+      if (previousDay < monthStart) {
+        setCarriedForwardPnl(0);
         return;
       }
 
-      // Fall back to global
-      const { data: globalData } = await supabase
-        .from("monthly_balances")
-        .select("starting_balance")
+      const { data: previousTrades } = await supabase
+        .from("trades")
+        .select("outcome")
         .eq("user_id", user.id)
-        .eq("is_global", true)
-        .maybeSingle();
+        .gte("trade_date", monthStart)
+        .lte("trade_date", previousDay);
 
-      if (globalData) {
-        setStartingBalance(Number(globalData.starting_balance));
-      } else {
-        setStartingBalance(0);
-      }
+      const prePeriodPnL = (previousTrades ?? []).reduce(
+        (sum, trade) => sum + Number(trade.outcome ?? 0),
+        0,
+      );
+
+      setCarriedForwardPnl(prePeriodPnL);
     };
-    fetchBalance();
+
+    fetchBalanceContext();
   }, [user, dateRange.start]);
 
   const chartData = useMemo(() => {
-    const base = startingBalance;
+    const base = startingBalance - brokerCharges + carriedForwardPnl;
 
     if (period === "daily") {
       const hourly: Record<number, number> = {};
@@ -185,10 +229,10 @@ const PnLLineChart: React.FC<PnLLineChartProps> = ({ trades, period, dateRange }
       cum += dailyMap[key] || 0;
       return { label: format(d, "dd MMM"), pnl: cum };
     });
-  }, [trades, period, dateRange, startingBalance]);
+  }, [trades, period, dateRange, startingBalance, brokerCharges, carriedForwardPnl]);
 
   const periodLabel =
-    period === "daily" ? "Hourly P&L" : period === "weekly" ? "Daily P&L" : "Monthly P&L";
+    period === "daily" ? "Hourly Account Balance" : period === "weekly" ? "Daily Account Balance" : "Monthly Account Balance";
 
   return (
     <div className="stat-card">
