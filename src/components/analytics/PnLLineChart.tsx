@@ -56,11 +56,16 @@ const GlowDot = (props: any) => {
 };
 
 const CustomCursor = (props: any) => {
-  const { points, top, left, height, width, payloadIndex, payload } = props;
+  const { points, top, left, height, payload } = props;
   if (!points || !points.length) return null;
   const { x, y } = points[0];
-  const value = payload?.[payloadIndex]?.value ?? payload?.[0]?.value;
-  const formattedValue = value != null ? `$${Number(value).toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 })}` : "";
+  // payload here is the array of tooltip entries; each has a .payload with the data point
+  const dataPoint = payload?.[0]?.payload;
+  const balance = dataPoint?.pnl;
+  const formattedValue = balance != null
+    ? `$${Number(balance).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+    : "";
+  const labelWidth = formattedValue.length * 6.5 + 12;
   return (
     <g>
       {/* Vertical dashed line */}
@@ -73,11 +78,11 @@ const CustomCursor = (props: any) => {
         x1={left} y1={y} x2={x} y2={y}
         stroke="hsl(160, 84%, 39%)" strokeWidth={1} strokeDasharray="4 4" opacity={0.6}
       />
-      {/* Y-axis label */}
+      {/* Y-axis balance label */}
       {formattedValue && (
         <g>
-          <rect x={left - 4} y={y - 10} width={formattedValue.length * 7 + 8} height={20} rx={4} fill="hsl(160, 84%, 39%)" opacity={0.9} />
-          <text x={left} y={y + 4} fontSize={10} fill="hsl(0, 0%, 5%)" fontWeight={600}>
+          <rect x={left - labelWidth - 2} y={y - 10} width={labelWidth} height={20} rx={4} fill="hsl(160, 84%, 39%)" opacity={0.9} />
+          <text x={left - labelWidth + 4} y={y + 4} fontSize={10} fill="hsl(0, 0%, 5%)" fontWeight={600}>
             {formattedValue}
           </text>
         </g>
