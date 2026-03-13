@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import {
   ResponsiveContainer,
   LineChart,
@@ -9,6 +9,8 @@ import {
   Tooltip,
 } from "recharts";
 import { format, parseISO, eachDayOfInterval } from "date-fns";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 import type { TimeWindowPeriod } from "@/hooks/useTimeWindow";
 
 interface Trade {
@@ -35,7 +37,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
         className="text-sm font-bold"
         style={{ color: payload[0].value >= 0 ? "hsl(160, 84%, 45%)" : "hsl(0, 84%, 60%)" }}
       >
-        {payload[0].value >= 0 ? "+" : ""}${payload[0].value.toFixed(2)}
+        ${payload[0].value.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
       </p>
     </div>
   );
@@ -54,9 +56,52 @@ const GlowDot = (props: any) => {
 };
 
 const PnLLineChart: React.FC<PnLLineChartProps> = ({ trades, period, dateRange }) => {
+  const { user } = useAuth();
+  const [startingBalance, setStartingBalance] = useState<number>(0);
+
+  useEffect(() => {
+    const fetchBalance = async () => {
+      if (!user) return;
+      const now = parseISO(dateRange.start);
+      const year = now.getFullYear();
+      const month = now.getMonth() + 1;
+
+      // Try month-specific balance first
+      const { data: monthData } = await supabase
+        .from("monthly_balances")
+        .select("starting_balance")
+        .eq("user_id", user.id)
+        .eq("year", year)
+        .eq("month", month)
+        .eq("is_global", false)
+        .maybeSingle();
+
+      if (monthData) {
+        setStartingBalance(Number(monthData.starting_balance));
+        return;
+      }
+
+      // Fall back to global
+      const { data: globalData } = await supabase
+        .from("monthly_balances")
+        .select("starting_balance")
+        .eq("user_id", user.id)
+        .eq("is_global", true)
+        .maybeSingle();
+
+      if (globalData) {
+        setStartingBalance(Number(globalData.starting_balance));
+      } else {
+        setStartingBalance(0);
+      }
+    };
+    fetchBalance();
+  }, [user, dateRange.start]);
+
   const chartData = useMemo(() => {
+    const base = startingBalance;
+
     if (period === "daily") {
-      // Group by hour (0-23)
       const hourly: Record<number, number> = {};
       for (let h = 0; h < 24; h++) hourly[h] = 0;
       trades.forEach((t) => {
@@ -65,8 +110,7 @@ const PnLLineChart: React.FC<PnLLineChartProps> = ({ trades, period, dateRange }
           if (!isNaN(hour)) hourly[hour] += Number(t.outcome);
         }
       });
-      // Cumulative
-      let cum = 0;
+      let cum = base;
       return Object.entries(hourly).map(([h, pnl]) => {
         cum += pnl;
         return { label: `${String(h).padStart(2, "0")}:00`, pnl: cum };
@@ -74,7 +118,6 @@ const PnLLineChart: React.FC<PnLLineChartProps> = ({ trades, period, dateRange }
     }
 
     if (period === "weekly") {
-      // Group by day
       const start = parseISO(dateRange.start);
       const end = parseISO(dateRange.end);
       const days = eachDayOfInterval({ start, end });
@@ -83,7 +126,7 @@ const PnLLineChart: React.FC<PnLLineChartProps> = ({ trades, period, dateRange }
       trades.forEach((t) => {
         if (dailyMap[t.trade_date] !== undefined) dailyMap[t.trade_date] += Number(t.outcome);
       });
-      let cum = 0;
+      let cum = base;
       return days.map((d) => {
         const key = format(d, "yyyy-MM-dd");
         cum += dailyMap[key] || 0;
@@ -91,7 +134,7 @@ const PnLLineChart: React.FC<PnLLineChartProps> = ({ trades, period, dateRange }
       });
     }
 
-    // Monthly - group by day of month
+    // Monthly
     const start = parseISO(dateRange.start);
     const end = parseISO(dateRange.end);
     const days = eachDayOfInterval({ start, end });
@@ -100,13 +143,13 @@ const PnLLineChart: React.FC<PnLLineChartProps> = ({ trades, period, dateRange }
     trades.forEach((t) => {
       if (dailyMap[t.trade_date] !== undefined) dailyMap[t.trade_date] += Number(t.outcome);
     });
-    let cum = 0;
+    let cum = base;
     return days.map((d) => {
       const key = format(d, "yyyy-MM-dd");
       cum += dailyMap[key] || 0;
       return { label: format(d, "dd MMM"), pnl: cum };
     });
-  }, [trades, period, dateRange]);
+  }, [trades, period, dateRange, startingBalance]);
 
   const periodLabel =
     period === "daily" ? "Hourly P&L" : period === "weekly" ? "Daily P&L" : "Monthly P&L";
@@ -116,7 +159,7 @@ const PnLLineChart: React.FC<PnLLineChartProps> = ({ trades, period, dateRange }
       <p className="text-muted-foreground text-sm mb-4">{periodLabel}</p>
       <div className="h-[280px] sm:h-[320px]">
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={chartData} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
+          <LineChart data={chartData} margin={{ top: 5, right: 10, left: 10, bottom: 5 }}>
             <defs>
               <linearGradient id="lineGlow" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stopColor="hsl(160, 84%, 45%)" stopOpacity={0.4} />
@@ -144,7 +187,8 @@ const PnLLineChart: React.FC<PnLLineChartProps> = ({ trades, period, dateRange }
               tick={{ fontSize: 11, fill: "hsl(0, 0%, 55%)" }}
               tickLine={false}
               axisLine={{ stroke: "hsl(0, 0%, 14%)" }}
-              tickFormatter={(v) => `$${v}`}
+              tickFormatter={(v) => `$${v.toLocaleString()}`}
+              domain={["dataMin - 50", "dataMax + 50"]}
             />
             <Tooltip content={<CustomTooltip />} cursor={{ stroke: "hsl(160, 84%, 39%)", strokeWidth: 1, strokeDasharray: "4 4" }} />
             <Line
