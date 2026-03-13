@@ -206,7 +206,7 @@ const PnLLineChart: React.FC<PnLLineChartProps> = ({ trades, period, dateRange }
       cum += dailyMap[key] || 0;
       return { label: format(d, "dd MMM"), pnl: cum };
     });
-  }, [trades, period, dateRange, startingBalance]);
+  }, [trades, period, dateRange, startingBalance, brokerCharges]);
 
   const periodLabel =
     period === "daily" ? "Hourly P&L" : period === "weekly" ? "Daily P&L" : "Monthly P&L";
