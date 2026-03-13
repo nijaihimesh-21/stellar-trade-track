@@ -7,6 +7,7 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
+  ReferenceLine,
 } from "recharts";
 import { format, parseISO, eachDayOfInterval } from "date-fns";
 import { supabase } from "@/integrations/supabase/client";
