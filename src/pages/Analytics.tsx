@@ -205,6 +205,9 @@ const Analytics = () => {
         </div>
       </div>
 
+      {/* P&L Line Chart */}
+      <PnLLineChart trades={trades} period={period} dateRange={dates} />
+
       {/* Trade Form Modal */}
       <TradeForm
         open={showTradeForm}
