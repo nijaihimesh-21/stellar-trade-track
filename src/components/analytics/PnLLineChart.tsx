@@ -156,7 +156,7 @@ const PnLLineChart: React.FC<PnLLineChartProps> = ({ trades, period, dateRange }
   }, [user, dateRange.start]);
 
   const chartData = useMemo(() => {
-    const base = startingBalance;
+    const base = startingBalance - brokerCharges;
 
     if (period === "daily") {
       const hourly: Record<number, number> = {};
