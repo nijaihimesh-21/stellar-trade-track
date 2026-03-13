@@ -94,26 +94,45 @@ const CustomCursor = (props: any) => {
 const PnLLineChart: React.FC<PnLLineChartProps> = ({ trades, period, dateRange }) => {
   const { user } = useAuth();
   const [startingBalance, setStartingBalance] = useState<number>(0);
+  const [brokerCharges, setBrokerCharges] = useState<number>(0);
 
   useEffect(() => {
     const fetchBalance = async () => {
       if (!user) return;
       const now = parseISO(dateRange.start);
       const year = now.getFullYear();
-      const month = now.getMonth() + 1;
+      const monthZeroBased = now.getMonth();
+      const monthOneBased = now.getMonth() + 1;
 
-      // Try month-specific balance first
-      const { data: monthData } = await supabase
+      // First try the same month indexing used in Trade Log (0-11)
+      const { data: monthDataZero } = await supabase
         .from("monthly_balances")
-        .select("starting_balance")
+        .select("starting_balance, broker_charges")
         .eq("user_id", user.id)
         .eq("year", year)
-        .eq("month", month)
+        .eq("month", monthZeroBased)
         .eq("is_global", false)
         .maybeSingle();
 
-      if (monthData) {
-        setStartingBalance(Number(monthData.starting_balance));
+      if (monthDataZero) {
+        setStartingBalance(Number(monthDataZero.starting_balance));
+        setBrokerCharges(Number(monthDataZero.broker_charges ?? 0));
+        return;
+      }
+
+      // Backward-compatible fallback in case month was stored as 1-12
+      const { data: monthDataOne } = await supabase
+        .from("monthly_balances")
+        .select("starting_balance, broker_charges")
+        .eq("user_id", user.id)
+        .eq("year", year)
+        .eq("month", monthOneBased)
+        .eq("is_global", false)
+        .maybeSingle();
+
+      if (monthDataOne) {
+        setStartingBalance(Number(monthDataOne.starting_balance));
+        setBrokerCharges(Number(monthDataOne.broker_charges ?? 0));
         return;
       }
 
@@ -127,8 +146,10 @@ const PnLLineChart: React.FC<PnLLineChartProps> = ({ trades, period, dateRange }
 
       if (globalData) {
         setStartingBalance(Number(globalData.starting_balance));
+        setBrokerCharges(0);
       } else {
         setStartingBalance(0);
+        setBrokerCharges(0);
       }
     };
     fetchBalance();
