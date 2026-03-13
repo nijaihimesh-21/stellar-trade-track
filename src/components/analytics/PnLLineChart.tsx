@@ -55,6 +55,37 @@ const GlowDot = (props: any) => {
   );
 };
 
+const CustomCursor = (props: any) => {
+  const { points, top, left, height, width, payloadIndex, payload } = props;
+  if (!points || !points.length) return null;
+  const { x, y } = points[0];
+  const value = payload?.[payloadIndex]?.value ?? payload?.[0]?.value;
+  const formattedValue = value != null ? `$${Number(value).toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 })}` : "";
+  return (
+    <g>
+      {/* Vertical dashed line */}
+      <line
+        x1={x} y1={top} x2={x} y2={top + height}
+        stroke="hsl(160, 84%, 39%)" strokeWidth={1} strokeDasharray="4 4" opacity={0.6}
+      />
+      {/* Horizontal dashed line to Y-axis */}
+      <line
+        x1={left} y1={y} x2={x} y2={y}
+        stroke="hsl(160, 84%, 39%)" strokeWidth={1} strokeDasharray="4 4" opacity={0.6}
+      />
+      {/* Y-axis label */}
+      {formattedValue && (
+        <g>
+          <rect x={left - 4} y={y - 10} width={formattedValue.length * 7 + 8} height={20} rx={4} fill="hsl(160, 84%, 39%)" opacity={0.9} />
+          <text x={left} y={y + 4} fontSize={10} fill="hsl(0, 0%, 5%)" fontWeight={600}>
+            {formattedValue}
+          </text>
+        </g>
+      )}
+    </g>
+  );
+};
+
 const PnLLineChart: React.FC<PnLLineChartProps> = ({ trades, period, dateRange }) => {
   const { user } = useAuth();
   const [startingBalance, setStartingBalance] = useState<number>(0);
