@@ -14,6 +14,7 @@ interface Trade {
   outcome: number;
   session: string | null;
   trade_date: string;
+  trade_time: string;
 }
 
 const Analytics = () => {
