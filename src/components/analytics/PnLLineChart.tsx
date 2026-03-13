@@ -221,19 +221,7 @@ const PnLLineChart: React.FC<PnLLineChartProps> = ({ trades, period, dateRange }
               tickFormatter={(v) => `$${v.toLocaleString()}`}
               domain={["dataMin - 50", "dataMax + 50"]}
             />
-            <Tooltip content={<CustomTooltip />} cursor={{ stroke: "hsl(160, 84%, 39%)", strokeWidth: 1, strokeDasharray: "4 4" }} />
-            <ReferenceLine
-              y={startingBalance}
-              stroke="hsl(0, 0%, 45%)"
-              strokeDasharray="6 4"
-              strokeWidth={1}
-              label={{
-                value: `$${startingBalance.toLocaleString()}`,
-                position: "left",
-                fill: "hsl(0, 0%, 55%)",
-                fontSize: 11,
-              }}
-            />
+            <Tooltip content={<CustomTooltip />} cursor={<CustomCursor />} />
             <Line
               type="monotone"
               dataKey="pnl"
