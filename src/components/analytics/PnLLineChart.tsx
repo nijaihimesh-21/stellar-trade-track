@@ -180,14 +180,17 @@ const PnLLineChart: React.FC<PnLLineChartProps> = ({ trades, period, dateRange }
 
   const chartData = useMemo(() => {
     const base = startingBalance - brokerCharges + carriedForwardPnl;
+    const now = new Date();
+    const currentHour = now.getHours();
+    const todayStr = format(now, "yyyy-MM-dd");
 
     if (period === "daily") {
       const hourly: Record<number, number> = {};
-      for (let h = 0; h < 24; h++) hourly[h] = 0;
+      for (let h = 0; h <= currentHour; h++) hourly[h] = 0;
       trades.forEach((t) => {
         if (t.trade_time) {
           const hour = parseInt(t.trade_time.split(":")[0], 10);
-          if (!isNaN(hour)) hourly[hour] += Number(t.outcome);
+          if (!isNaN(hour) && hour <= currentHour) hourly[hour] += Number(t.outcome);
         }
       });
       let cum = base;
@@ -200,7 +203,7 @@ const PnLLineChart: React.FC<PnLLineChartProps> = ({ trades, period, dateRange }
     if (period === "weekly") {
       const start = parseISO(dateRange.start);
       const end = parseISO(dateRange.end);
-      const days = eachDayOfInterval({ start, end });
+      const days = eachDayOfInterval({ start, end }).filter((d) => format(d, "yyyy-MM-dd") <= todayStr);
       const dailyMap: Record<string, number> = {};
       days.forEach((d) => (dailyMap[format(d, "yyyy-MM-dd")] = 0));
       trades.forEach((t) => {
@@ -217,7 +220,7 @@ const PnLLineChart: React.FC<PnLLineChartProps> = ({ trades, period, dateRange }
     // Monthly
     const start = parseISO(dateRange.start);
     const end = parseISO(dateRange.end);
-    const days = eachDayOfInterval({ start, end });
+    const days = eachDayOfInterval({ start, end }).filter((d) => format(d, "yyyy-MM-dd") <= todayStr);
     const dailyMap: Record<string, number> = {};
     days.forEach((d) => (dailyMap[format(d, "yyyy-MM-dd")] = 0));
     trades.forEach((t) => {
