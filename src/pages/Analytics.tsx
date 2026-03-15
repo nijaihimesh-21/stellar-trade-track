@@ -50,11 +50,17 @@ const Analytics = () => {
   const winRate = trades.length > 0 ? ((wins / trades.length) * 100).toFixed(1) : "0.0";
   
   const sessionPnL = {
-    asia: trades.filter((t) => t.session === "asia").reduce((s, t) => s + Number(t.outcome), 0),
-    london: trades.filter((t) => t.session === "london").reduce((s, t) => s + Number(t.outcome), 0),
-    newyork: trades.filter((t) => t.session === "newyork").reduce((s, t) => s + Number(t.outcome), 0),
+    asia: trades.filter((t) => t.session?.toLowerCase() === "asia").reduce((s, t) => s + Number(t.outcome), 0),
+    london: trades.filter((t) => t.session?.toLowerCase() === "london").reduce((s, t) => s + Number(t.outcome), 0),
+    newyork: trades.filter((t) => t.session?.toLowerCase() === "new york").reduce((s, t) => s + Number(t.outcome), 0),
   };
   
+  const sessionTradeCount = {
+    asia: trades.filter((t) => t.session?.toLowerCase() === "asia").length,
+    london: trades.filter((t) => t.session?.toLowerCase() === "london").length,
+    newyork: trades.filter((t) => t.session?.toLowerCase() === "new york").length,
+  };
+
   const maxSessionPnL = Math.max(
     Math.abs(sessionPnL.asia),
     Math.abs(sessionPnL.london),
