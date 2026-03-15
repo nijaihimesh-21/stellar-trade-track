@@ -50,11 +50,17 @@ const Analytics = () => {
   const winRate = trades.length > 0 ? ((wins / trades.length) * 100).toFixed(1) : "0.0";
   
   const sessionPnL = {
-    asia: trades.filter((t) => t.session === "asia").reduce((s, t) => s + Number(t.outcome), 0),
-    london: trades.filter((t) => t.session === "london").reduce((s, t) => s + Number(t.outcome), 0),
-    newyork: trades.filter((t) => t.session === "newyork").reduce((s, t) => s + Number(t.outcome), 0),
+    asia: trades.filter((t) => t.session?.toLowerCase() === "asia").reduce((s, t) => s + Number(t.outcome), 0),
+    london: trades.filter((t) => t.session?.toLowerCase() === "london").reduce((s, t) => s + Number(t.outcome), 0),
+    newyork: trades.filter((t) => t.session?.toLowerCase() === "new york").reduce((s, t) => s + Number(t.outcome), 0),
   };
   
+  const sessionTradeCount = {
+    asia: trades.filter((t) => t.session?.toLowerCase() === "asia").length,
+    london: trades.filter((t) => t.session?.toLowerCase() === "london").length,
+    newyork: trades.filter((t) => t.session?.toLowerCase() === "new york").length,
+  };
+
   const maxSessionPnL = Math.max(
     Math.abs(sessionPnL.asia),
     Math.abs(sessionPnL.london),
@@ -146,20 +152,23 @@ const Analytics = () => {
         <p className="text-muted-foreground text-sm mb-4">Profit & Loss</p>
         <div className="space-y-4">
           {[
-            { name: "Asia", key: "asia", pnl: sessionPnL.asia },
-            { name: "London", key: "london", pnl: sessionPnL.london },
-            { name: "New York", key: "newyork", pnl: sessionPnL.newyork },
+            { name: "Asia", key: "asia" as const, pnl: sessionPnL.asia, count: sessionTradeCount.asia },
+            { name: "London", key: "london" as const, pnl: sessionPnL.london, count: sessionTradeCount.london },
+            { name: "New York", key: "newyork" as const, pnl: sessionPnL.newyork, count: sessionTradeCount.newyork },
           ].map((session) => (
             <div key={session.key} className="space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-foreground font-medium">{session.name}</span>
-                <span className={cn("font-semibold", session.pnl >= 0 ? "text-profit" : "text-loss")}>
-                  {session.pnl >= 0 ? "+" : ""}${Math.abs(session.pnl).toLocaleString()}
+                <div className="flex items-center gap-2">
+                  <span className="text-foreground font-medium">{session.name}</span>
+                  <span className="text-muted-foreground text-xs">({session.count} trades)</span>
+                </div>
+                <span className={cn("font-semibold", session.pnl > 0 ? "text-profit" : session.pnl < 0 ? "text-loss" : "text-muted-foreground")}>
+                  {session.pnl > 0 ? "+" : session.pnl < 0 ? "-" : ""}${Math.abs(session.pnl).toLocaleString("en-US", { minimumFractionDigits: 2 })}
                 </span>
               </div>
               <div className="h-1 bg-secondary rounded-full overflow-hidden">
                 <div
-                  className={cn("h-full rounded-full transition-all", session.pnl >= 0 ? "bg-profit" : "bg-loss")}
+                  className={cn("h-full rounded-full transition-all", session.pnl > 0 ? "bg-profit" : session.pnl < 0 ? "bg-loss" : "bg-muted-foreground")}
                   style={{ width: `${(Math.abs(session.pnl) / maxSessionPnL) * 100}%` }}
                 />
               </div>
