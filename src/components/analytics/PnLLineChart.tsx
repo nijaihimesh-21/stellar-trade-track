@@ -260,10 +260,13 @@ const PnLLineChart: React.FC<PnLLineChartProps> = ({ trades, period, dateRange }
             <XAxis
               dataKey="label"
               stroke="hsl(0, 0%, 55%)"
-              tick={{ fontSize: 11, fill: "hsl(0, 0%, 55%)" }}
+              tick={{ fontSize: 10, fill: "hsl(0, 0%, 55%)" }}
               tickLine={false}
               axisLine={{ stroke: "hsl(0, 0%, 14%)" }}
-              interval={period === "monthly" ? Math.max(Math.floor(chartData.length / 8), 1) : 0}
+              interval={period === "monthly" ? Math.max(Math.floor(chartData.length / 6), 1) : period === "weekly" ? 0 : Math.max(Math.floor(chartData.length / 8), 1)}
+              angle={period === "monthly" ? -45 : 0}
+              textAnchor={period === "monthly" ? "end" : "middle"}
+              height={period === "monthly" ? 50 : 30}
             />
             <YAxis
               stroke="hsl(0, 0%, 55%)"
