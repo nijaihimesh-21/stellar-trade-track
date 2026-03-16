@@ -6,6 +6,7 @@ import { Plus, TrendingUp, TrendingDown } from "lucide-react";
 import TradeForm from "@/components/TradeForm";
 import { cn } from "@/lib/utils";
 import PnLLineChart from "@/components/analytics/PnLLineChart";
+import WithdrawalCard from "@/components/analytics/WithdrawalCard";
 import { useTimeWindow, TimeWindowPeriod } from "@/hooks/useTimeWindow";
 
 interface Trade {
@@ -213,6 +214,9 @@ const Analytics = () => {
           </div>
         </div>
       </div>
+
+      {/* Withdrawals */}
+      <WithdrawalCard dateRange={dates} totalPnL={totalPnL} />
 
       {/* P&L Line Chart */}
       <PnLLineChart trades={trades} period={period} dateRange={dates} />
