@@ -215,6 +215,9 @@ const Analytics = () => {
         </div>
       </div>
 
+      {/* Withdrawals */}
+      <WithdrawalCard dateRange={dates} totalPnL={totalPnL} />
+
       {/* P&L Line Chart */}
       <PnLLineChart trades={trades} period={period} dateRange={dates} />
 
