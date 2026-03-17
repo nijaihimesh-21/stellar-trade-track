@@ -195,7 +195,7 @@ const PnLLineChart: React.FC<PnLLineChartProps> = ({ trades, period, dateRange }
   }, [user, dateRange.start]);
 
   const chartData = useMemo(() => {
-    const base = startingBalance - brokerCharges + carriedForwardPnl;
+    const base = startingBalance - brokerCharges - monthWithdrawals + carriedForwardPnl;
     const now = new Date();
     const currentHour = now.getHours();
     const todayStr = format(now, "yyyy-MM-dd");
