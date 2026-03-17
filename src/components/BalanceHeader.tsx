@@ -305,6 +305,16 @@ const BalanceHeader = ({ year, month, monthPnl, monthName }: BalanceHeaderProps)
           </div>
         )}
 
+        {/* Withdrawals */}
+        {startingBalance !== null && monthWithdrawals > 0 && (
+          <div className="text-center">
+            <p className="text-xs text-muted-foreground uppercase tracking-wide">Withdrawals</p>
+            <span className="text-lg font-bold text-loss">
+              -${monthWithdrawals.toLocaleString()}
+            </span>
+          </div>
+        )}
+
         {startingBalance !== null && (
           <div className="text-right">
             <p className="text-xs text-muted-foreground uppercase tracking-wide">Current Balance</p>
