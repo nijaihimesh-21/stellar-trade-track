@@ -24,6 +24,7 @@ const Analytics = () => {
   const [trades, setTrades] = useState<Trade[]>([]);
   const [showTradeForm, setShowTradeForm] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [totalWithdrawn, setTotalWithdrawn] = useState(0);
 
   const fetchTrades = async () => {
     if (!user) return;
