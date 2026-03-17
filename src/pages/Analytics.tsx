@@ -43,8 +43,20 @@ const Analytics = () => {
     setLoading(false);
   };
 
+  const fetchWithdrawals = async () => {
+    if (!user) return;
+    const { data } = await supabase
+      .from("withdrawals")
+      .select("amount")
+      .eq("user_id", user.id)
+      .gte("withdrawal_date", dates.start)
+      .lte("withdrawal_date", dates.end);
+    setTotalWithdrawn((data || []).reduce((sum, w) => sum + Number(w.amount), 0));
+  };
+
   useEffect(() => {
     fetchTrades();
+    fetchWithdrawals();
   }, [user, period, type]);
 
   const totalPnL = trades.reduce((sum, t) => sum + Number(t.outcome), 0);
