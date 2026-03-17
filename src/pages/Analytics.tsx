@@ -132,19 +132,17 @@ const Analytics = () => {
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="stat-card">
-          <p className="text-muted-foreground text-sm mb-2">Profit & Loss</p>
-         <p className={cn("text-2xl sm:text-3xl font-bold", totalPnL >= 0 ? "text-profit" : "text-loss")}>
-            {totalPnL >= 0 ? "+" : ""} ${Math.abs(totalPnL).toLocaleString("en-US", { minimumFractionDigits: 2 })}
+          <p className="text-muted-foreground text-sm mb-2">Account Balance</p>
+         <p className={cn("text-2xl sm:text-3xl font-bold", (totalPnL - totalWithdrawn) >= 0 ? "text-profit" : "text-loss")}>
+            {(totalPnL - totalWithdrawn) >= 0 ? "+" : ""} ${Math.abs(totalPnL - totalWithdrawn).toLocaleString("en-US", { minimumFractionDigits: 2 })}
           </p>
-          <div className="flex items-center gap-1 mt-2 text-sm">
-            {totalPnL >= 0 ? (
-              <TrendingUp className="w-4 h-4 text-profit" />
-            ) : (
-              <TrendingDown className="w-4 h-4 text-loss" />
-            )}
+          <div className="flex items-center gap-1 mt-2 text-xs text-muted-foreground">
             <span className={totalPnL >= 0 ? "text-profit" : "text-loss"}>
-              {totalPnL >= 0 ? "12.5%" : "-8.2%"}
+              {totalPnL >= 0 ? "+" : ""}${Math.abs(totalPnL).toLocaleString("en-US", { minimumFractionDigits: 2 })} P&L
             </span>
+            {totalWithdrawn > 0 && (
+              <span className="text-loss"> − ${totalWithdrawn.toLocaleString("en-US", { minimumFractionDigits: 2 })} withdrawn</span>
+            )}
           </div>
         </div>
 
