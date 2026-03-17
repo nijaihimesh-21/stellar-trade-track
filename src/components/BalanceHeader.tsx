@@ -72,9 +72,10 @@ const BalanceHeader = ({ year, month, monthPnl, monthName }: BalanceHeaderProps)
 
   const fetchMonthWithdrawals = async () => {
     if (!user) return;
-    const startDate = `${year}-${String(month).padStart(2, "0")}-01`;
-    const endDay = new Date(year, month, 0).getDate();
-    const endDate = `${year}-${String(month).padStart(2, "0")}-${String(endDay).padStart(2, "0")}`;
+    const m = month + 1; // month is 0-indexed from JS getMonth()
+    const startDate = `${year}-${String(m).padStart(2, "0")}-01`;
+    const endDay = new Date(year, m, 0).getDate();
+    const endDate = `${year}-${String(m).padStart(2, "0")}-${String(endDay).padStart(2, "0")}`;
 
     const { data } = await supabase
       .from("withdrawals")
