@@ -96,6 +96,7 @@ const PnLLineChart: React.FC<PnLLineChartProps> = ({ trades, period, dateRange }
   const [startingBalance, setStartingBalance] = useState<number>(0);
   const [brokerCharges, setBrokerCharges] = useState<number>(0);
   const [carriedForwardPnl, setCarriedForwardPnl] = useState<number>(0);
+  const [monthWithdrawals, setMonthWithdrawals] = useState<number>(0);
 
   useEffect(() => {
     const fetchBalanceContext = async () => {
@@ -151,6 +152,21 @@ const PnLLineChart: React.FC<PnLLineChartProps> = ({ trades, period, dateRange }
         }
       }
 
+      // Fetch month withdrawals
+      const m = startDate.getMonth() + 1;
+      const wStartDate = `${year}-${String(m).padStart(2, "0")}-01`;
+      const endDay = new Date(year, m, 0).getDate();
+      const wEndDate = `${year}-${String(m).padStart(2, "0")}-${String(endDay).padStart(2, "0")}`;
+
+      const { data: wData } = await supabase
+        .from("withdrawals")
+        .select("amount")
+        .eq("user_id", user.id)
+        .gte("withdrawal_date", wStartDate)
+        .lte("withdrawal_date", wEndDate);
+
+      setMonthWithdrawals((wData || []).reduce((s, w) => s + Number(w.amount), 0));
+
       // Carry forward month-to-date P&L before the current visible range
       const monthStart = format(startOfMonth(startDate), "yyyy-MM-dd");
       const previousDay = format(addDays(startDate, -1), "yyyy-MM-dd");
@@ -179,7 +195,7 @@ const PnLLineChart: React.FC<PnLLineChartProps> = ({ trades, period, dateRange }
   }, [user, dateRange.start]);
 
   const chartData = useMemo(() => {
-    const base = startingBalance - brokerCharges + carriedForwardPnl;
+    const base = startingBalance - brokerCharges - monthWithdrawals + carriedForwardPnl;
     const now = new Date();
     const currentHour = now.getHours();
     const todayStr = format(now, "yyyy-MM-dd");
@@ -232,7 +248,7 @@ const PnLLineChart: React.FC<PnLLineChartProps> = ({ trades, period, dateRange }
       cum += dailyMap[key] || 0;
       return { label: format(d, "dd MMM"), pnl: cum };
     });
-  }, [trades, period, dateRange, startingBalance, brokerCharges, carriedForwardPnl]);
+  }, [trades, period, dateRange, startingBalance, brokerCharges, monthWithdrawals, carriedForwardPnl]);
 
   const periodLabel =
     period === "daily" ? "Hourly Account Balance" : period === "weekly" ? "Daily Account Balance" : "Monthly Account Balance";
