@@ -248,7 +248,7 @@ const PnLLineChart: React.FC<PnLLineChartProps> = ({ trades, period, dateRange }
       cum += dailyMap[key] || 0;
       return { label: format(d, "dd MMM"), pnl: cum };
     });
-  }, [trades, period, dateRange, startingBalance, brokerCharges, carriedForwardPnl]);
+  }, [trades, period, dateRange, startingBalance, brokerCharges, monthWithdrawals, carriedForwardPnl]);
 
   const periodLabel =
     period === "daily" ? "Hourly Account Balance" : period === "weekly" ? "Daily Account Balance" : "Monthly Account Balance";
