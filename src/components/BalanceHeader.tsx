@@ -185,7 +185,7 @@ const BalanceHeader = ({ year, month, monthPnl, monthName }: BalanceHeaderProps)
     }
   };
 
-  const currentBalance = startingBalance !== null ? startingBalance + monthPnl - brokerCharges : null;
+  const currentBalance = startingBalance !== null ? startingBalance + monthPnl - brokerCharges - monthWithdrawals : null;
 
   if (loading) return null;
 
