@@ -25,15 +25,17 @@ const BalanceHeader = ({ year, month, monthPnl, monthName }: BalanceHeaderProps)
   const [isEditingCharges, setIsEditingCharges] = useState(false);
   const [chargesInput, setChargesInput] = useState("");
 
+  const [monthWithdrawals, setMonthWithdrawals] = useState<number>(0);
+
   useEffect(() => {
     fetchBalance();
+    fetchMonthWithdrawals();
   }, [user, year, month]);
 
   const fetchBalance = async () => {
     if (!user) return;
     setLoading(true);
 
-    // First check for a specific month override
     const { data: monthData } = await supabase
       .from("monthly_balances")
       .select("*")
@@ -51,7 +53,6 @@ const BalanceHeader = ({ year, month, monthPnl, monthName }: BalanceHeaderProps)
       return;
     }
 
-    // Fall back to global balance (year=0, month=0)
     const { data: globalData } = await supabase
       .from("monthly_balances")
       .select("*")
@@ -67,6 +68,23 @@ const BalanceHeader = ({ year, month, monthPnl, monthName }: BalanceHeaderProps)
     }
     setBrokerCharges(0);
     setLoading(false);
+  };
+
+  const fetchMonthWithdrawals = async () => {
+    if (!user) return;
+    const startDate = `${year}-${String(month).padStart(2, "0")}-01`;
+    const endDay = new Date(year, month, 0).getDate();
+    const endDate = `${year}-${String(month).padStart(2, "0")}-${String(endDay).padStart(2, "0")}`;
+
+    const { data } = await supabase
+      .from("withdrawals")
+      .select("amount")
+      .eq("user_id", user.id)
+      .gte("withdrawal_date", startDate)
+      .lte("withdrawal_date", endDate);
+
+    const total = (data || []).reduce((sum, w) => sum + Number(w.amount), 0);
+    setMonthWithdrawals(total);
   };
 
   const saveBalance = async () => {
@@ -167,7 +185,7 @@ const BalanceHeader = ({ year, month, monthPnl, monthName }: BalanceHeaderProps)
     }
   };
 
-  const currentBalance = startingBalance !== null ? startingBalance + monthPnl - brokerCharges : null;
+  const currentBalance = startingBalance !== null ? startingBalance + monthPnl - brokerCharges - monthWithdrawals : null;
 
   if (loading) return null;
 
@@ -284,6 +302,16 @@ const BalanceHeader = ({ year, month, monthPnl, monthName }: BalanceHeaderProps)
                 </Button>
               </div>
             )}
+          </div>
+        )}
+
+        {/* Withdrawals */}
+        {startingBalance !== null && monthWithdrawals > 0 && (
+          <div className="text-center">
+            <p className="text-xs text-muted-foreground uppercase tracking-wide">Withdrawals</p>
+            <span className="text-lg font-bold text-loss">
+              -${monthWithdrawals.toLocaleString()}
+            </span>
           </div>
         )}
 
