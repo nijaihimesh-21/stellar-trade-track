@@ -328,7 +328,13 @@ const BalanceHeader = ({ year, month, monthPnl, monthName }: BalanceHeaderProps)
               "text-xs",
               monthPnl >= 0 ? "text-profit" : "text-loss"
             )}>
-              {monthPnl >= 0 ? "+" : ""}{monthPnl.toLocaleString()}$ this month
+              {monthPnl >= 0 ? "+" : ""}{monthPnl.toLocaleString()}$ P&L
+              {monthWithdrawals > 0 && (
+                <span className="text-loss"> − ${monthWithdrawals.toLocaleString()} withdrawn</span>
+              )}
+              {brokerCharges > 0 && (
+                <span className="text-loss"> − ${brokerCharges.toLocaleString()} charges</span>
+              )}
             </p>
           </div>
         )}
