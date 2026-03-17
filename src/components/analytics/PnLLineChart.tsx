@@ -152,6 +152,21 @@ const PnLLineChart: React.FC<PnLLineChartProps> = ({ trades, period, dateRange }
         }
       }
 
+      // Fetch month withdrawals
+      const m = startDate.getMonth() + 1;
+      const wStartDate = `${year}-${String(m).padStart(2, "0")}-01`;
+      const endDay = new Date(year, m, 0).getDate();
+      const wEndDate = `${year}-${String(m).padStart(2, "0")}-${String(endDay).padStart(2, "0")}`;
+
+      const { data: wData } = await supabase
+        .from("withdrawals")
+        .select("amount")
+        .eq("user_id", user.id)
+        .gte("withdrawal_date", wStartDate)
+        .lte("withdrawal_date", wEndDate);
+
+      setMonthWithdrawals((wData || []).reduce((s, w) => s + Number(w.amount), 0));
+
       // Carry forward month-to-date P&L before the current visible range
       const monthStart = format(startOfMonth(startDate), "yyyy-MM-dd");
       const previousDay = format(addDays(startDate, -1), "yyyy-MM-dd");
