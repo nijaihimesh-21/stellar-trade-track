@@ -96,6 +96,7 @@ const PnLLineChart: React.FC<PnLLineChartProps> = ({ trades, period, dateRange }
   const [startingBalance, setStartingBalance] = useState<number>(0);
   const [brokerCharges, setBrokerCharges] = useState<number>(0);
   const [carriedForwardPnl, setCarriedForwardPnl] = useState<number>(0);
+  const [monthWithdrawals, setMonthWithdrawals] = useState<number>(0);
 
   useEffect(() => {
     const fetchBalanceContext = async () => {
