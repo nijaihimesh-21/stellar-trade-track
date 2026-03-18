@@ -28,14 +28,14 @@ const Analytics = () => {
 
   const fetchTrades = async () => {
     if (!user) return;
-    
+
     setLoading(true);
-    const { data, error } = await supabase
-      .from("trades")
-      .select("*")
-      .eq("user_id", user.id)
-      .gte("trade_date", dates.start)
-      .lte("trade_date", dates.end);
+    const { data, error } = await supabase.
+    from("trades").
+    select("*").
+    eq("user_id", user.id).
+    gte("trade_date", dates.start).
+    lte("trade_date", dates.end);
 
     if (!error && data) {
       setTrades(data as Trade[]);
@@ -45,12 +45,12 @@ const Analytics = () => {
 
   const fetchWithdrawals = async () => {
     if (!user) return;
-    const { data } = await supabase
-      .from("withdrawals")
-      .select("amount")
-      .eq("user_id", user.id)
-      .gte("withdrawal_date", dates.start)
-      .lte("withdrawal_date", dates.end);
+    const { data } = await supabase.
+    from("withdrawals").
+    select("amount").
+    eq("user_id", user.id).
+    gte("withdrawal_date", dates.start).
+    lte("withdrawal_date", dates.end);
     setTotalWithdrawn((data || []).reduce((sum, w) => sum + Number(w.amount), 0));
   };
 
@@ -61,18 +61,18 @@ const Analytics = () => {
 
   const totalPnL = trades.reduce((sum, t) => sum + Number(t.outcome), 0);
   const wins = trades.filter((t) => Number(t.outcome) > 0).length;
-  const winRate = trades.length > 0 ? ((wins / trades.length) * 100).toFixed(1) : "0.0";
-  
+  const winRate = trades.length > 0 ? (wins / trades.length * 100).toFixed(1) : "0.0";
+
   const sessionPnL = {
     asia: trades.filter((t) => t.session?.toLowerCase() === "asia").reduce((s, t) => s + Number(t.outcome), 0),
     london: trades.filter((t) => t.session?.toLowerCase() === "london").reduce((s, t) => s + Number(t.outcome), 0),
-    newyork: trades.filter((t) => t.session?.toLowerCase() === "new york").reduce((s, t) => s + Number(t.outcome), 0),
+    newyork: trades.filter((t) => t.session?.toLowerCase() === "new york").reduce((s, t) => s + Number(t.outcome), 0)
   };
-  
+
   const sessionTradeCount = {
     asia: trades.filter((t) => t.session?.toLowerCase() === "asia").length,
     london: trades.filter((t) => t.session?.toLowerCase() === "london").length,
-    newyork: trades.filter((t) => t.session?.toLowerCase() === "new york").length,
+    newyork: trades.filter((t) => t.session?.toLowerCase() === "new york").length
   };
 
   const maxSessionPnL = Math.max(
@@ -87,7 +87,7 @@ const Analytics = () => {
     acc[t.pair].pnl += Number(t.outcome);
     acc[t.pair].trades += 1;
     return acc;
-  }, {} as Record<string, { pnl: number; trades: number }>);
+  }, {} as Record<string, {pnl: number;trades: number;}>);
 
   const sortedPairs = Object.entries(pairStats).sort((a, b) => b[1].pnl - a[1].pnl);
   const bestPairs = sortedPairs.filter(([, s]) => s.pnl > 0).slice(0, 3);
@@ -101,20 +101,20 @@ const Analytics = () => {
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
           <div className="flex bg-secondary rounded-lg p-1 w-fit">
-            {(["daily", "weekly", "monthly"] as TimeWindowPeriod[]).map((p) => (
-              <button
-                key={p}
-                onClick={() => setPeriod(p)}
-                className={cn(
-                  "px-3 sm:px-4 py-1.5 rounded-md text-xs sm:text-sm font-medium transition-all capitalize",
-                  period === p
-                    ? "bg-card text-foreground shadow-sm"
-                    : "text-muted-foreground hover:text-foreground"
-                )}
-              >
+            {(["daily", "weekly", "monthly"] as TimeWindowPeriod[]).map((p) =>
+            <button
+              key={p}
+              onClick={() => setPeriod(p)}
+              className={cn(
+                "px-3 sm:px-4 py-1.5 rounded-md text-xs sm:text-sm font-medium transition-all capitalize",
+                period === p ?
+                "bg-card text-foreground shadow-sm" :
+                "text-muted-foreground hover:text-foreground"
+              )}>
+              
                 {p}
               </button>
-            ))}
+            )}
           </div>
           <span className="text-xs text-muted-foreground truncate">
             {type === "calendar" ? "Calendar" : "Rolling"} · {dates.start} → {dates.end}
@@ -122,8 +122,8 @@ const Analytics = () => {
         </div>
         <Button
           onClick={() => setShowTradeForm(true)}
-          className="bg-card border border-border hover:bg-secondary text-foreground w-fit"
-        >
+          className="bg-card border border-border hover:bg-secondary text-foreground w-fit">
+          
           <Plus className="w-4 h-4 mr-2" />
           Add
         </Button>
@@ -132,17 +132,17 @@ const Analytics = () => {
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="stat-card">
-          <p className="text-muted-foreground text-sm mb-2">Account Balance</p>
-         <p className={cn("text-2xl sm:text-3xl font-bold", (totalPnL - totalWithdrawn) >= 0 ? "text-profit" : "text-loss")}>
-            {(totalPnL - totalWithdrawn) >= 0 ? "+" : ""} ${Math.abs(totalPnL - totalWithdrawn).toLocaleString("en-US", { minimumFractionDigits: 2 })}
+          <p className="text-muted-foreground text-sm mb-2">​PnL </p>
+         <p className={cn("text-2xl sm:text-3xl font-bold", totalPnL - totalWithdrawn >= 0 ? "text-profit" : "text-loss")}>
+            {totalPnL - totalWithdrawn >= 0 ? "+" : ""} ${Math.abs(totalPnL - totalWithdrawn).toLocaleString("en-US", { minimumFractionDigits: 2 })}
           </p>
           <div className="flex items-center gap-1 mt-2 text-xs text-muted-foreground">
             <span className={totalPnL >= 0 ? "text-profit" : "text-loss"}>
               {totalPnL >= 0 ? "+" : ""}${Math.abs(totalPnL).toLocaleString("en-US", { minimumFractionDigits: 2 })} P&L
             </span>
-            {totalWithdrawn > 0 && (
-              <span className="text-loss"> − ${totalWithdrawn.toLocaleString("en-US", { minimumFractionDigits: 2 })} withdrawn</span>
-            )}
+            {totalWithdrawn > 0 &&
+            <span className="text-loss"> − ${totalWithdrawn.toLocaleString("en-US", { minimumFractionDigits: 2 })} withdrawn</span>
+            }
           </div>
         </div>
 
@@ -164,11 +164,11 @@ const Analytics = () => {
         <p className="text-muted-foreground text-sm mb-4">Profit & Loss</p>
         <div className="space-y-4">
           {[
-            { name: "Asia", key: "asia" as const, pnl: sessionPnL.asia, count: sessionTradeCount.asia },
-            { name: "London", key: "london" as const, pnl: sessionPnL.london, count: sessionTradeCount.london },
-            { name: "New York", key: "newyork" as const, pnl: sessionPnL.newyork, count: sessionTradeCount.newyork },
-          ].map((session) => (
-            <div key={session.key} className="space-y-2">
+          { name: "Asia", key: "asia" as const, pnl: sessionPnL.asia, count: sessionTradeCount.asia },
+          { name: "London", key: "london" as const, pnl: sessionPnL.london, count: sessionTradeCount.london },
+          { name: "New York", key: "newyork" as const, pnl: sessionPnL.newyork, count: sessionTradeCount.newyork }].
+          map((session) =>
+          <div key={session.key} className="space-y-2">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <span className="text-foreground font-medium">{session.name}</span>
@@ -180,12 +180,12 @@ const Analytics = () => {
               </div>
               <div className="h-1 bg-secondary rounded-full overflow-hidden">
                 <div
-                  className={cn("h-full rounded-full transition-all", session.pnl > 0 ? "bg-profit" : session.pnl < 0 ? "bg-loss" : "bg-muted-foreground")}
-                  style={{ width: `${(Math.abs(session.pnl) / maxSessionPnL) * 100}%` }}
-                />
+                className={cn("h-full rounded-full transition-all", session.pnl > 0 ? "bg-profit" : session.pnl < 0 ? "bg-loss" : "bg-muted-foreground")}
+                style={{ width: `${Math.abs(session.pnl) / maxSessionPnL * 100}%` }} />
+              
               </div>
             </div>
-          ))}
+          )}
         </div>
       </div>
 
@@ -194,34 +194,34 @@ const Analytics = () => {
         <div className="stat-card">
           <p className="text-muted-foreground text-sm mb-4">Best Pairs</p>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            {bestPairs.length > 0 ? (
-              bestPairs.map(([pair, stats]) => (
-                <div key={pair} className="bg-secondary rounded-lg p-4">
+            {bestPairs.length > 0 ?
+            bestPairs.map(([pair, stats]) =>
+            <div key={pair} className="bg-secondary rounded-lg p-4">
                   <p className="text-muted-foreground text-xs mb-1">{pair}</p>
                   <p className="text-profit text-xl font-bold">+${stats.pnl.toLocaleString()}</p>
                   <p className="text-muted-foreground text-xs mt-1">{stats.trades} trades</p>
                 </div>
-              ))
-            ) : (
-              <p className="text-muted-foreground col-span-3">No profitable pairs yet</p>
-            )}
+            ) :
+
+            <p className="text-muted-foreground col-span-3">No profitable pairs yet</p>
+            }
           </div>
         </div>
 
         <div className="stat-card">
           <p className="text-muted-foreground text-sm mb-4">Worst Pairs</p>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            {worstPairs.length > 0 ? (
-              worstPairs.map(([pair, stats]) => (
-                <div key={pair} className="bg-secondary rounded-lg p-4">
+            {worstPairs.length > 0 ?
+            worstPairs.map(([pair, stats]) =>
+            <div key={pair} className="bg-secondary rounded-lg p-4">
                   <p className="text-muted-foreground text-xs mb-1">{pair}</p>
                   <p className="text-loss text-xl font-bold">-${Math.abs(stats.pnl).toLocaleString()}</p>
                   <p className="text-muted-foreground text-xs mt-1">{stats.trades} trades</p>
                 </div>
-              ))
-            ) : (
-              <p className="text-muted-foreground col-span-3">No losing pairs yet</p>
-            )}
+            ) :
+
+            <p className="text-muted-foreground col-span-3">No losing pairs yet</p>
+            }
           </div>
         </div>
       </div>
@@ -239,10 +239,10 @@ const Analytics = () => {
         onSuccess={() => {
           setShowTradeForm(false);
           fetchTrades();
-        }}
-      />
-    </div>
-  );
+        }} />
+      
+    </div>);
+
 };
 
 export default Analytics;
