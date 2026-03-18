@@ -173,7 +173,7 @@ const WithdrawalCard = ({ dateRange, totalPnL }: WithdrawalCardProps) => {
         <div>
           <p className="text-xs text-muted-foreground">Withdrawn</p>
           <p className="text-lg font-bold text-primary">
-            {totalWithdrawn > 0 ? "-" : ""}${totalWithdrawn.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+            ${totalWithdrawn.toLocaleString("en-US", { minimumFractionDigits: 2 })}
           </p>
         </div>
         <div>
@@ -191,7 +191,7 @@ const WithdrawalCard = ({ dateRange, totalPnL }: WithdrawalCardProps) => {
         <div key={w.id} className="flex items-center justify-between bg-secondary rounded-lg px-3 py-2">
               <div>
                 <span className="text-loss font-semibold text-sm">
-                  -${Number(w.amount).toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                  ${Number(w.amount).toLocaleString("en-US", { minimumFractionDigits: 2 })}
                 </span>
                 <span className="text-muted-foreground text-xs ml-2">
                   {format(new Date(w.withdrawal_date + "T00:00:00"), "MMM dd, yyyy")}
