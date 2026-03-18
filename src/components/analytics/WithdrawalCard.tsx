@@ -18,7 +18,7 @@ interface Withdrawal {
 }
 
 interface WithdrawalCardProps {
-  dateRange: { start: string; end: string };
+  dateRange: {start: string;end: string;};
   totalPnL: number;
 }
 
@@ -33,13 +33,13 @@ const WithdrawalCard = ({ dateRange, totalPnL }: WithdrawalCardProps) => {
 
   const fetchWithdrawals = async () => {
     if (!user) return;
-    const { data, error } = await supabase
-      .from("withdrawals")
-      .select("*")
-      .eq("user_id", user.id)
-      .gte("withdrawal_date", dateRange.start)
-      .lte("withdrawal_date", dateRange.end)
-      .order("withdrawal_date", { ascending: false });
+    const { data, error } = await supabase.
+    from("withdrawals").
+    select("*").
+    eq("user_id", user.id).
+    gte("withdrawal_date", dateRange.start).
+    lte("withdrawal_date", dateRange.end).
+    order("withdrawal_date", { ascending: false });
 
     if (!error && data) {
       setWithdrawals(data as Withdrawal[]);
@@ -66,7 +66,7 @@ const WithdrawalCard = ({ dateRange, totalPnL }: WithdrawalCardProps) => {
       user_id: user.id,
       amount: val,
       withdrawal_date: format(date, "yyyy-MM-dd"),
-      notes: notes.trim() || null,
+      notes: notes.trim() || null
     });
 
     if (error) {
@@ -103,54 +103,54 @@ const WithdrawalCard = ({ dateRange, totalPnL }: WithdrawalCardProps) => {
           variant="ghost"
           size="sm"
           className="h-7 text-xs"
-          onClick={() => setShowForm(!showForm)}
-        >
+          onClick={() => setShowForm(!showForm)}>
+          
           <Plus className="w-3 h-3 mr-1" />
           Add
         </Button>
       </div>
 
       {/* Add Form */}
-      {showForm && (
-        <div className="bg-secondary rounded-lg p-3 mb-4 space-y-3">
+      {showForm &&
+      <div className="bg-secondary rounded-lg p-3 mb-4 space-y-3">
           <div className="grid grid-cols-2 gap-2">
             <Input
-              type="number"
-              placeholder="Amount ($)"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              className="h-9 bg-background"
-            />
+            type="number"
+            placeholder="Amount ($)"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+            className="h-9 bg-background" />
+          
             <Popover>
               <PopoverTrigger asChild>
                 <Button
-                  variant="outline"
-                  className={cn(
-                    "h-9 justify-start text-left font-normal text-xs",
-                    !date && "text-muted-foreground"
-                  )}
-                >
+                variant="outline"
+                className={cn(
+                  "h-9 justify-start text-left font-normal text-xs",
+                  !date && "text-muted-foreground"
+                )}>
+                
                   <CalendarIcon className="w-3 h-3 mr-1" />
                   {date ? format(date, "MMM dd, yyyy") : "Date"}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0" align="start">
                 <Calendar
-                  mode="single"
-                  selected={date}
-                  onSelect={setDate}
-                  initialFocus
-                  className="p-3 pointer-events-auto"
-                />
+                mode="single"
+                selected={date}
+                onSelect={setDate}
+                initialFocus
+                className="p-3 pointer-events-auto" />
+              
               </PopoverContent>
             </Popover>
           </div>
           <Input
-            placeholder="Notes (optional)"
-            value={notes}
-            onChange={(e) => setNotes(e.target.value)}
-            className="h-9 bg-background"
-          />
+          placeholder="Notes (optional)"
+          value={notes}
+          onChange={(e) => setNotes(e.target.value)}
+          className="h-9 bg-background" />
+        
           <div className="flex gap-2">
             <Button size="sm" className="h-8 text-xs" onClick={handleSubmit} disabled={loading}>
               Save
@@ -160,7 +160,7 @@ const WithdrawalCard = ({ dateRange, totalPnL }: WithdrawalCardProps) => {
             </Button>
           </div>
         </div>
-      )}
+      }
 
       {/* Summary */}
       <div className="grid grid-cols-3 gap-4 mb-4">
@@ -172,7 +172,7 @@ const WithdrawalCard = ({ dateRange, totalPnL }: WithdrawalCardProps) => {
         </div>
         <div>
           <p className="text-xs text-muted-foreground">Withdrawn</p>
-          <p className="text-lg font-bold text-loss">
+          <p className="text-lg font-bold text-primary">
             {totalWithdrawn > 0 ? "-" : ""}${totalWithdrawn.toLocaleString("en-US", { minimumFractionDigits: 2 })}
           </p>
         </div>
@@ -185,10 +185,10 @@ const WithdrawalCard = ({ dateRange, totalPnL }: WithdrawalCardProps) => {
       </div>
 
       {/* Withdrawal List */}
-      {withdrawals.length > 0 && (
-        <div className="space-y-2">
-          {withdrawals.map((w) => (
-            <div key={w.id} className="flex items-center justify-between bg-secondary rounded-lg px-3 py-2">
+      {withdrawals.length > 0 &&
+      <div className="space-y-2">
+          {withdrawals.map((w) =>
+        <div key={w.id} className="flex items-center justify-between bg-secondary rounded-lg px-3 py-2">
               <div>
                 <span className="text-loss font-semibold text-sm">
                   -${Number(w.amount).toLocaleString("en-US", { minimumFractionDigits: 2 })}
@@ -196,28 +196,28 @@ const WithdrawalCard = ({ dateRange, totalPnL }: WithdrawalCardProps) => {
                 <span className="text-muted-foreground text-xs ml-2">
                   {format(new Date(w.withdrawal_date + "T00:00:00"), "MMM dd, yyyy")}
                 </span>
-                {w.notes && (
-                  <span className="text-muted-foreground text-xs ml-2">· {w.notes}</span>
-                )}
+                {w.notes &&
+            <span className="text-muted-foreground text-xs ml-2">· {w.notes}</span>
+            }
               </div>
               <Button
-                size="icon"
-                variant="ghost"
-                className="h-6 w-6 text-muted-foreground hover:text-loss"
-                onClick={() => handleDelete(w.id)}
-              >
+            size="icon"
+            variant="ghost"
+            className="h-6 w-6 text-muted-foreground hover:text-loss"
+            onClick={() => handleDelete(w.id)}>
+            
                 <Trash2 className="w-3 h-3" />
               </Button>
             </div>
-          ))}
+        )}
         </div>
-      )}
+      }
 
-      {withdrawals.length === 0 && !showForm && (
-        <p className="text-xs text-muted-foreground text-center py-2">No withdrawals in this period</p>
-      )}
-    </div>
-  );
+      {withdrawals.length === 0 && !showForm &&
+      <p className="text-xs text-muted-foreground text-center py-2">No withdrawals in this period</p>
+      }
+    </div>);
+
 };
 
 export default WithdrawalCard;
