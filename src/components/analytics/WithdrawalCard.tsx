@@ -173,7 +173,7 @@ const WithdrawalCard = ({ dateRange, totalPnL }: WithdrawalCardProps) => {
         <div>
           <p className="text-xs text-muted-foreground">Withdrawn</p>
           <p className="text-lg font-bold text-primary">
-            {totalWithdrawn > 0 ? "-" : ""}${totalWithdrawn.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+            ${totalWithdrawn.toLocaleString("en-US", { minimumFractionDigits: 2 })}
           </p>
         </div>
         <div>
