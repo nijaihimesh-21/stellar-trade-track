@@ -178,9 +178,9 @@ const WithdrawalCard = ({ dateRange, totalPnL }: WithdrawalCardProps) => {
         </div>
         <div>
           
-          <p className={cn("text-lg font-bold", netBalance >= 0 ? "text-profit" : "text-loss")}>
-            {netBalance >= 0 ? "+" : ""}${Math.abs(netBalance).toLocaleString("en-US", { minimumFractionDigits: 2 })}
-          </p>
+          
+
+          
         </div>
       </div>
 
