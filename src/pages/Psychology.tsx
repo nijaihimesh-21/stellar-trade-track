@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import { Brain, Plus, Pencil, Trash2, Calendar, Star, ChevronDown } from "lucide-react";
+import { Brain, Plus, Pencil, Trash2, Calendar, Star, ChevronDown, TrendingUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { format, startOfWeek, endOfWeek, startOfMonth, endOfMonth, parseISO } from "date-fns";
 import { CalendarIcon } from "lucide-react";
