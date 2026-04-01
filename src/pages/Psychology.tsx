@@ -335,6 +335,15 @@ const Psychology = () => {
                 <p className="text-sm text-foreground whitespace-pre-wrap">{entry.notes}</p>
               </div>
             )}
+            {(entry as any).strategy_improvement && (
+              <div className="mt-4 pt-3 border-t border-border">
+                <p className="text-xs text-muted-foreground uppercase mb-1 flex items-center gap-1.5">
+                  <TrendingUp className="w-3.5 h-3.5 text-primary" />
+                  Strategy / Technical Improvement
+                </p>
+                <p className="text-sm text-foreground whitespace-pre-wrap">{(entry as any).strategy_improvement}</p>
+              </div>
+            )}
             {entry.conclusion && (
               <div className="mt-4 pt-3 border-t border-border">
                 <p className="text-xs text-muted-foreground uppercase mb-1">Conclusion</p>
