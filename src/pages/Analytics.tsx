@@ -2,12 +2,14 @@ import React, { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
-import { Plus, TrendingUp, TrendingDown } from "lucide-react";
+import { Plus, TrendingUp, TrendingDown, Download } from "lucide-react";
 import TradeForm from "@/components/TradeForm";
 import { cn } from "@/lib/utils";
 import PnLLineChart from "@/components/analytics/PnLLineChart";
 import WithdrawalCard from "@/components/analytics/WithdrawalCard";
 import { useTimeWindow, TimeWindowPeriod } from "@/hooks/useTimeWindow";
+import { generateTradeLogPDF } from "@/utils/generateTradeLogPDF";
+import { toast } from "sonner";
 
 interface Trade {
   id: string;
@@ -41,6 +43,37 @@ const Analytics = () => {
       setTrades(data as Trade[]);
     }
     setLoading(false);
+  };
+
+  const handleGeneratePDF = async () => {
+    if (!user || trades.length === 0) {
+      toast.error("No trades to generate report");
+      return;
+    }
+
+    // Fetch full trade data with notes/strategy/rr
+    const { data: fullTrades } = await supabase
+      .from("trades")
+      .select("*")
+      .eq("user_id", user.id)
+      .gte("trade_date", dates.start)
+      .lte("trade_date", dates.end);
+
+    // Fetch psychology entries for this period
+    const { data: psychEntries } = await supabase
+      .from("psychology_entries")
+      .select("*")
+      .eq("user_id", user.id)
+      .gte("period_start", dates.start)
+      .lte("period_end", dates.end);
+
+    await generateTradeLogPDF({
+      trades: (fullTrades || []) as any,
+      psychologyEntries: (psychEntries || []) as any,
+      periodLabel: period.charAt(0).toUpperCase() + period.slice(1),
+      dateRange: dates,
+    });
+    toast.success("PDF report generated!");
   };
 
   const fetchWithdrawals = async () => {
@@ -120,13 +153,22 @@ const Analytics = () => {
             {type === "calendar" ? "Calendar" : "Rolling"} · {dates.start} → {dates.end}
           </span>
         </div>
-        <Button
-          onClick={() => setShowTradeForm(true)}
-          className="bg-card border border-border hover:bg-secondary text-foreground w-fit">
-          
-          <Plus className="w-4 h-4 mr-2" />
-          Add
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            onClick={handleGeneratePDF}
+            disabled={trades.length === 0}
+            variant="outline"
+            className="border-border text-foreground hover:bg-secondary w-fit">
+            <Download className="w-4 h-4 mr-2" />
+            PDF
+          </Button>
+          <Button
+            onClick={() => setShowTradeForm(true)}
+            className="bg-card border border-border hover:bg-secondary text-foreground w-fit">
+            <Plus className="w-4 h-4 mr-2" />
+            Add
+          </Button>
+        </div>
       </div>
 
       {/* Stats Cards */}

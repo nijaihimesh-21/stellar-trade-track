@@ -91,6 +91,7 @@ export type Database = {
           period_start: string
           period_type: string
           rating: number | null
+          strategy_improvement: string | null
           title: string | null
           updated_at: string
           user_id: string
@@ -108,6 +109,7 @@ export type Database = {
           period_start: string
           period_type?: string
           rating?: number | null
+          strategy_improvement?: string | null
           title?: string | null
           updated_at?: string
           user_id: string
@@ -125,6 +127,7 @@ export type Database = {
           period_start?: string
           period_type?: string
           rating?: number | null
+          strategy_improvement?: string | null
           title?: string | null
           updated_at?: string
           user_id?: string

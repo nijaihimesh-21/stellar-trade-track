@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import { Brain, Plus, Pencil, Trash2, Calendar, Star, ChevronDown } from "lucide-react";
+import { Brain, Plus, Pencil, Trash2, Calendar, Star, ChevronDown, TrendingUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { format, startOfWeek, endOfWeek, startOfMonth, endOfMonth, parseISO } from "date-fns";
 import { CalendarIcon } from "lucide-react";
@@ -56,6 +56,7 @@ const Psychology = () => {
   const [improvements, setImprovements] = useState("");
   const [notes, setNotes] = useState("");
   const [conclusion, setConclusion] = useState("");
+  const [strategyImprovement, setStrategyImprovement] = useState("");
   const [rating, setRating] = useState<number>(3);
 
   const fetchEntries = useCallback(async () => {
@@ -83,6 +84,7 @@ const Psychology = () => {
     setImprovements("");
     setNotes("");
     setConclusion("");
+    setStrategyImprovement("");
     setRating(3);
     setEditEntry(null);
   };
@@ -129,6 +131,7 @@ const Psychology = () => {
     setImprovements(entry.improvements || "");
     setNotes(entry.notes || "");
     setConclusion(entry.conclusion || "");
+    setStrategyImprovement((entry as any).strategy_improvement || "");
     setRating(entry.rating || 3);
     setDialogOpen(true);
   };
@@ -151,6 +154,7 @@ const Psychology = () => {
       improvements: improvements || null,
       notes: notes || null,
       conclusion: conclusion || null,
+      strategy_improvement: strategyImprovement || null,
       rating,
     };
 
@@ -331,6 +335,15 @@ const Psychology = () => {
                 <p className="text-sm text-foreground whitespace-pre-wrap">{entry.notes}</p>
               </div>
             )}
+            {(entry as any).strategy_improvement && (
+              <div className="mt-4 pt-3 border-t border-border">
+                <p className="text-xs text-muted-foreground uppercase mb-1 flex items-center gap-1.5">
+                  <TrendingUp className="w-3.5 h-3.5 text-primary" />
+                  Strategy / Technical Improvement
+                </p>
+                <p className="text-sm text-foreground whitespace-pre-wrap">{(entry as any).strategy_improvement}</p>
+              </div>
+            )}
             {entry.conclusion && (
               <div className="mt-4 pt-3 border-t border-border">
                 <p className="text-xs text-muted-foreground uppercase mb-1">Conclusion</p>
@@ -488,6 +501,20 @@ const Psychology = () => {
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 placeholder="Any other thoughts..."
+                className="bg-secondary border-border text-foreground"
+                rows={2}
+              />
+            </div>
+
+            <div>
+              <Label className="text-muted-foreground flex items-center gap-1.5">
+                <TrendingUp className="w-3.5 h-3.5 text-primary" />
+                Strategy / Technical Improvement
+              </Label>
+              <Textarea
+                value={strategyImprovement}
+                onChange={(e) => setStrategyImprovement(e.target.value)}
+                placeholder="What strategy or technical adjustments will you make? e.g. tighten SL on Asia session, avoid counter-trend entries..."
                 className="bg-secondary border-border text-foreground"
                 rows={2}
               />
