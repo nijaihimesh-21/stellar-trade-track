@@ -153,13 +153,22 @@ const Analytics = () => {
             {type === "calendar" ? "Calendar" : "Rolling"} · {dates.start} → {dates.end}
           </span>
         </div>
-        <Button
-          onClick={() => setShowTradeForm(true)}
-          className="bg-card border border-border hover:bg-secondary text-foreground w-fit">
-          
-          <Plus className="w-4 h-4 mr-2" />
-          Add
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            onClick={handleGeneratePDF}
+            disabled={trades.length === 0}
+            variant="outline"
+            className="border-border text-foreground hover:bg-secondary w-fit">
+            <Download className="w-4 h-4 mr-2" />
+            PDF
+          </Button>
+          <Button
+            onClick={() => setShowTradeForm(true)}
+            className="bg-card border border-border hover:bg-secondary text-foreground w-fit">
+            <Plus className="w-4 h-4 mr-2" />
+            Add
+          </Button>
+        </div>
       </div>
 
       {/* Stats Cards */}
