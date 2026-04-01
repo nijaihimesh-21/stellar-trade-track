@@ -131,6 +131,7 @@ const Psychology = () => {
     setImprovements(entry.improvements || "");
     setNotes(entry.notes || "");
     setConclusion(entry.conclusion || "");
+    setStrategyImprovement((entry as any).strategy_improvement || "");
     setRating(entry.rating || 3);
     setDialogOpen(true);
   };
