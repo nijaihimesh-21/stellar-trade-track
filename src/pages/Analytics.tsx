@@ -45,6 +45,37 @@ const Analytics = () => {
     setLoading(false);
   };
 
+  const handleGeneratePDF = async () => {
+    if (!user || trades.length === 0) {
+      toast.error("No trades to generate report");
+      return;
+    }
+
+    // Fetch full trade data with notes/strategy/rr
+    const { data: fullTrades } = await supabase
+      .from("trades")
+      .select("*")
+      .eq("user_id", user.id)
+      .gte("trade_date", dates.start)
+      .lte("trade_date", dates.end);
+
+    // Fetch psychology entries for this period
+    const { data: psychEntries } = await supabase
+      .from("psychology_entries")
+      .select("*")
+      .eq("user_id", user.id)
+      .gte("period_start", dates.start)
+      .lte("period_end", dates.end);
+
+    await generateTradeLogPDF({
+      trades: (fullTrades || []) as any,
+      psychologyEntries: (psychEntries || []) as any,
+      periodLabel: period.charAt(0).toUpperCase() + period.slice(1),
+      dateRange: dates,
+    });
+    toast.success("PDF report generated!");
+  };
+
   const fetchWithdrawals = async () => {
     if (!user) return;
     const { data } = await supabase.
