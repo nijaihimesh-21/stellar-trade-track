@@ -154,6 +154,7 @@ const Psychology = () => {
       improvements: improvements || null,
       notes: notes || null,
       conclusion: conclusion || null,
+      strategy_improvement: strategyImprovement || null,
       rating,
     };
 
