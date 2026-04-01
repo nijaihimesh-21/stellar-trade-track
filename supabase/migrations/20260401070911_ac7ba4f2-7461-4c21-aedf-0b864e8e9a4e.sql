@@ -1,0 +1,1 @@
+ALTER TABLE public.psychology_entries ADD COLUMN strategy_improvement text DEFAULT NULL;
