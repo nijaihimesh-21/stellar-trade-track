@@ -507,6 +507,20 @@ const Psychology = () => {
             </div>
 
             <div>
+              <Label className="text-muted-foreground flex items-center gap-1.5">
+                <TrendingUp className="w-3.5 h-3.5 text-primary" />
+                Strategy / Technical Improvement
+              </Label>
+              <Textarea
+                value={strategyImprovement}
+                onChange={(e) => setStrategyImprovement(e.target.value)}
+                placeholder="What strategy or technical adjustments will you make? e.g. tighten SL on Asia session, avoid counter-trend entries..."
+                className="bg-secondary border-border text-foreground"
+                rows={2}
+              />
+            </div>
+
+            <div>
               <Label className="text-muted-foreground">Final Conclusion</Label>
               <Textarea
                 value={conclusion}
