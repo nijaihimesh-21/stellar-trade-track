@@ -2,12 +2,14 @@ import React, { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
-import { Plus, TrendingUp, TrendingDown } from "lucide-react";
+import { Plus, TrendingUp, TrendingDown, Download } from "lucide-react";
 import TradeForm from "@/components/TradeForm";
 import { cn } from "@/lib/utils";
 import PnLLineChart from "@/components/analytics/PnLLineChart";
 import WithdrawalCard from "@/components/analytics/WithdrawalCard";
 import { useTimeWindow, TimeWindowPeriod } from "@/hooks/useTimeWindow";
+import { generateTradeLogPDF } from "@/utils/generateTradeLogPDF";
+import { toast } from "sonner";
 
 interface Trade {
   id: string;
