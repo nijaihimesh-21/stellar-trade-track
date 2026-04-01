@@ -56,6 +56,7 @@ const Psychology = () => {
   const [improvements, setImprovements] = useState("");
   const [notes, setNotes] = useState("");
   const [conclusion, setConclusion] = useState("");
+  const [strategyImprovement, setStrategyImprovement] = useState("");
   const [rating, setRating] = useState<number>(3);
 
   const fetchEntries = useCallback(async () => {
