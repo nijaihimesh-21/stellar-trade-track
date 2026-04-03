@@ -90,7 +90,7 @@ const Analytics = () => {
   useEffect(() => {
     fetchTrades();
     fetchWithdrawals();
-  }, [user, period, type]);
+  }, [user, dates.start, dates.end]);
 
   const totalPnL = trades.reduce((sum, t) => sum + Number(t.outcome), 0);
   const wins = trades.filter((t) => Number(t.outcome) > 0).length;
