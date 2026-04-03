@@ -18,6 +18,7 @@ interface Trade {
   session: string | null;
   trade_date: string;
   trade_time: string;
+  risk_reward: string | null;
 }
 
 const Analytics = () => {
@@ -90,7 +91,7 @@ const Analytics = () => {
   useEffect(() => {
     fetchTrades();
     fetchWithdrawals();
-  }, [user, period, type]);
+  }, [user, dates.start, dates.end]);
 
   const totalPnL = trades.reduce((sum, t) => sum + Number(t.outcome), 0);
   const wins = trades.filter((t) => Number(t.outcome) > 0).length;
@@ -126,7 +127,18 @@ const Analytics = () => {
   const bestPairs = sortedPairs.filter(([, s]) => s.pnl > 0).slice(0, 3);
   const worstPairs = sortedPairs.filter(([, s]) => s.pnl < 0).slice(-3).reverse();
 
-  const avgRR = trades.length > 0 ? "1:2.5" : "0:0";
+  const avgRR = (() => {
+    const rrValues = trades
+      .map((t) => {
+        if (!t.risk_reward) return null;
+        const match = t.risk_reward.match(/1:([\d.]+)/);
+        return match ? parseFloat(match[1]) : null;
+      })
+      .filter((v): v is number => v !== null);
+    if (rrValues.length === 0) return "0:0";
+    const avg = rrValues.reduce((s, v) => s + v, 0) / rrValues.length;
+    return `1:${avg.toFixed(1)}`;
+  })();
 
   return (
     <div className="space-y-6 animate-fade-in">
