@@ -18,6 +18,7 @@ interface Trade {
   session: string | null;
   trade_date: string;
   trade_time: string;
+  risk_reward: string | null;
 }
 
 const Analytics = () => {
