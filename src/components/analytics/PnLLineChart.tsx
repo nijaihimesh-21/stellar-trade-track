@@ -105,10 +105,10 @@ const PnLLineChart: React.FC<PnLLineChartProps> = ({ trades, period, dateRange }
       const startDate = parseISO(dateRange.start);
       const year = startDate.getFullYear();
       const monthZeroBased = startDate.getMonth();
-      const monthOneBased = startDate.getMonth() + 1;
+      const monthOneBased = monthZeroBased + 1;
 
-      // First try the same month indexing used in Trade Log (0-11)
-      const { data: monthDataZero } = await supabase
+      // 1. Try month-specific balance
+      const { data: monthData } = await supabase
         .from("monthly_balances")
         .select("starting_balance, broker_charges")
         .eq("user_id", user.id)
@@ -117,25 +117,20 @@ const PnLLineChart: React.FC<PnLLineChartProps> = ({ trades, period, dateRange }
         .eq("is_global", false)
         .maybeSingle();
 
-      if (monthDataZero) {
-        setStartingBalance(Number(monthDataZero.starting_balance));
-        setBrokerCharges(Number(monthDataZero.broker_charges ?? 0));
-      } else {
-        // Backward-compatible fallback in case month was stored as 1-12
-        const { data: monthDataOne } = await supabase
-          .from("monthly_balances")
-          .select("starting_balance, broker_charges")
-          .eq("user_id", user.id)
-          .eq("year", year)
-          .eq("month", monthOneBased)
-          .eq("is_global", false)
-          .maybeSingle();
+      let resolvedBalance: number | null = null;
+      let resolvedCharges = 0;
 
-        if (monthDataOne) {
-          setStartingBalance(Number(monthDataOne.starting_balance));
-          setBrokerCharges(Number(monthDataOne.broker_charges ?? 0));
+      if (monthData) {
+        resolvedBalance = Number(monthData.starting_balance);
+        resolvedCharges = Number(monthData.broker_charges ?? 0);
+      } else {
+        // 2. Carry forward from previous months
+        const carried = await computeCarriedForwardBalance(year, monthZeroBased);
+        if (carried !== null) {
+          resolvedBalance = carried;
+          resolvedCharges = 0;
         } else {
-          // Fall back to global
+          // 3. Fall back to global
           const { data: globalData } = await supabase
             .from("monthly_balances")
             .select("starting_balance")
@@ -143,20 +138,18 @@ const PnLLineChart: React.FC<PnLLineChartProps> = ({ trades, period, dateRange }
             .eq("is_global", true)
             .maybeSingle();
 
-          if (globalData) {
-            setStartingBalance(Number(globalData.starting_balance));
-          } else {
-            setStartingBalance(0);
-          }
-          setBrokerCharges(0);
+          resolvedBalance = globalData ? Number(globalData.starting_balance) : 0;
+          resolvedCharges = 0;
         }
       }
 
+      setStartingBalance(resolvedBalance ?? 0);
+      setBrokerCharges(resolvedCharges);
+
       // Fetch month withdrawals
-      const m = startDate.getMonth() + 1;
-      const wStartDate = `${year}-${String(m).padStart(2, "0")}-01`;
-      const endDay = new Date(year, m, 0).getDate();
-      const wEndDate = `${year}-${String(m).padStart(2, "0")}-${String(endDay).padStart(2, "0")}`;
+      const wStartDate = `${year}-${String(monthOneBased).padStart(2, "0")}-01`;
+      const endDay = new Date(year, monthOneBased, 0).getDate();
+      const wEndDate = `${year}-${String(monthOneBased).padStart(2, "0")}-${String(endDay).padStart(2, "0")}`;
 
       const { data: wData } = await supabase
         .from("withdrawals")
@@ -183,12 +176,98 @@ const PnLLineChart: React.FC<PnLLineChartProps> = ({ trades, period, dateRange }
         .gte("trade_date", monthStart)
         .lte("trade_date", previousDay);
 
-      const prePeriodPnL = (previousTrades ?? []).reduce(
-        (sum, trade) => sum + Number(trade.outcome ?? 0),
-        0,
+      setCarriedForwardPnl(
+        (previousTrades ?? []).reduce((sum, t) => sum + Number(t.outcome ?? 0), 0)
       );
+    };
 
-      setCarriedForwardPnl(prePeriodPnL);
+    const computeCarriedForwardBalance = async (
+      targetYear: number,
+      targetMonth: number
+    ): Promise<number | null> => {
+      if (!user) return null;
+
+      const { data: allBalances } = await supabase
+        .from("monthly_balances")
+        .select("*")
+        .eq("user_id", user.id)
+        .eq("is_global", false);
+
+      const { data: globalData } = await supabase
+        .from("monthly_balances")
+        .select("starting_balance")
+        .eq("user_id", user.id)
+        .eq("is_global", true)
+        .maybeSingle();
+
+      const balanceMap = new Map<number, { starting_balance: number; broker_charges: number }>();
+      (allBalances || []).forEach((b) => {
+        const key = b.year * 12 + b.month;
+        balanceMap.set(key, {
+          starting_balance: Number(b.starting_balance),
+          broker_charges: Number(b.broker_charges ?? 0),
+        });
+      });
+
+      const targetKey = targetYear * 12 + targetMonth;
+
+      let anchorKey: number | null = null;
+      for (const key of Array.from(balanceMap.keys()).sort((a, b) => b - a)) {
+        if (key < targetKey) { anchorKey = key; break; }
+      }
+
+      let runningBalance: number;
+      let startKey: number;
+
+      if (anchorKey !== null) {
+        runningBalance = balanceMap.get(anchorKey)!.starting_balance;
+        startKey = anchorKey;
+      } else if (globalData) {
+        runningBalance = Number(globalData.starting_balance);
+        const { data: earliest } = await supabase
+          .from("trades")
+          .select("trade_date")
+          .eq("user_id", user.id)
+          .order("trade_date", { ascending: true })
+          .limit(1);
+        if (!earliest?.length) return null;
+        const ed = new Date(earliest[0].trade_date);
+        startKey = ed.getFullYear() * 12 + ed.getMonth();
+        if (startKey >= targetKey) return null;
+      } else {
+        return null;
+      }
+
+      for (let k = startKey; k < targetKey; k++) {
+        const y = Math.floor(k / 12);
+        const m = k % 12;
+        const monthBal = balanceMap.get(k);
+
+        if (monthBal && k !== startKey) {
+          runningBalance = monthBal.starting_balance;
+        }
+
+        const charges = monthBal?.broker_charges ?? 0;
+        const mn = m + 1;
+        const sd = `${y}-${String(mn).padStart(2, "0")}-01`;
+        const ed2 = new Date(y, mn, 0).getDate();
+        const endD = `${y}-${String(mn).padStart(2, "0")}-${String(ed2).padStart(2, "0")}`;
+
+        const { data: mTrades } = await supabase
+          .from("trades").select("outcome").eq("user_id", user.id)
+          .gte("trade_date", sd).lte("trade_date", endD);
+
+        const { data: mWith } = await supabase
+          .from("withdrawals").select("amount").eq("user_id", user.id)
+          .gte("withdrawal_date", sd).lte("withdrawal_date", endD);
+
+        const pnl = (mTrades || []).reduce((s, t) => s + Number(t.outcome), 0);
+        const wth = (mWith || []).reduce((s, w) => s + Number(w.amount), 0);
+
+        runningBalance = runningBalance + pnl - charges - wth;
+      }
+
+      return runningBalance;
     };
 
     fetchBalanceContext();
