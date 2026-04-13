@@ -69,7 +69,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       {/* Backdrop overlay with blur */}
       {!collapsed && (
         <div
-          className="fixed inset-0 bg-background/60 backdrop-blur-sm z-40 transition-opacity duration-300"
+          className="fixed inset-0 bg-background/60 backdrop-blur-sm z-40 transition-opacity duration-300 lg:hidden"
           onClick={() => setCollapsed(true)}
         />
       )}
@@ -263,7 +263,12 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       </aside>
 
       {/* Main Content - always full width with fixed left padding for collapsed sidebar */}
-      <main className="min-h-screen ml-16">
+      <main
+        className={cn(
+          "min-h-screen ml-16 transition-[margin] duration-300",
+          !collapsed && "lg:ml-60"
+        )}
+      >
         <div className="p-3 sm:p-6 lg:p-8">{children}</div>
       </main>
     </div>
